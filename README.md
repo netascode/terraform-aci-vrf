@@ -64,8 +64,8 @@ module "aci_vrf" {
 
 | Name | Description |
 |------|-------------|
-| <a name="output_dn"></a> [dn](#output\_dn) | Distinguished name of `fvCtx` object |
-| <a name="output_name"></a> [name](#output\_name) | VRF name |
+| <a name="output_dn"></a> [dn](#output\_dn) | Distinguished name of `fvCtx` object. |
+| <a name="output_name"></a> [name](#output\_name) | VRF name. |
 
 ## Resources
 
