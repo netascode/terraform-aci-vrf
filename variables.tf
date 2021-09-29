@@ -68,37 +68,6 @@ variable "data_plane_learning" {
   default     = true
 }
 
-variable "contracts" {
-  description = "VRF contracts."
-  type = object({
-    consumers          = optional(list(string))
-    providers          = optional(list(string))
-    imported_consumers = optional(list(string))
-  })
-  default = {}
-
-  validation {
-    condition = alltrue([
-      for con in coalesce(var.contracts.consumers, []) : can(regex("^[a-zA-Z0-9_.-]{0,64}$", con))
-    ])
-    error_message = "`consumers`: Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
-  }
-
-  validation {
-    condition = alltrue([
-      for prov in coalesce(var.contracts.providers, []) : can(regex("^[a-zA-Z0-9_.-]{0,64}$", prov))
-    ])
-    error_message = "`providers`: Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
-  }
-
-  validation {
-    condition = alltrue([
-      for imp in coalesce(var.contracts.imported_consumers, []) : can(regex("^[a-zA-Z0-9_.-]{0,64}$", imp))
-    ])
-    error_message = "`imported_consumers`: Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
-  }
-}
-
 variable "bgp_timer_policy" {
   description = "VRF BGP timer policy name."
   type        = string
@@ -123,4 +92,41 @@ variable "dns_labels" {
   }
 }
 
+variable "contract_consumers" {
+  description = "List of contract consumers."
+  type        = list(string)
+  default     = []
 
+  validation {
+    condition = alltrue([
+      for c in var.contract_consumers : can(regex("^[a-zA-Z0-9_.-]{0,64}$", c))
+    ])
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "contract_providers" {
+  description = "List of contract providers."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for c in var.contract_providers : can(regex("^[a-zA-Z0-9_.-]{0,64}$", c))
+    ])
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "contract_imported_consumers" {
+  description = "List of imported contract consumers."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for c in var.contract_imported_consumers : can(regex("^[a-zA-Z0-9_.-]{0,64}$", c))
+    ])
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}

@@ -20,7 +20,7 @@ resource "aci_rest" "vzAny" {
 }
 
 resource "aci_rest" "vzRsAnyToCons" {
-  for_each   = var.contracts.consumers != null ? toset(var.contracts.consumers) : []
+  for_each   = toset(var.contract_consumers)
   dn         = "${aci_rest.vzAny.id}/rsanyToCons-${each.value}"
   class_name = "vzRsAnyToCons"
   content = {
@@ -29,7 +29,7 @@ resource "aci_rest" "vzRsAnyToCons" {
 }
 
 resource "aci_rest" "vzRsAnyToProv" {
-  for_each   = var.contracts.providers != null ? toset(var.contracts.providers) : []
+  for_each   = toset(var.contract_providers)
   dn         = "${aci_rest.vzAny.id}/rsanyToProv-${each.value}"
   class_name = "vzRsAnyToProv"
   content = {
@@ -38,7 +38,7 @@ resource "aci_rest" "vzRsAnyToProv" {
 }
 
 resource "aci_rest" "vzRsAnyToConsIf" {
-  for_each   = var.contracts.imported_consumers != null ? toset(var.contracts.imported_consumers) : []
+  for_each   = toset(var.contract_imported_consumers)
   dn         = "${aci_rest.vzAny.id}/rsanyToConsIf-${each.value}"
   class_name = "vzRsAnyToConsIf"
   content = {
