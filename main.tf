@@ -12,7 +12,7 @@ resource "aci_rest" "fvCtx" {
 }
 
 resource "aci_rest" "vzAny" {
-  dn         = "${aci_rest.fvCtx.id}/any"
+  dn         = "${aci_rest.fvCtx.dn}/any"
   class_name = "vzAny"
   content = {
     "descr" = ""
@@ -21,7 +21,7 @@ resource "aci_rest" "vzAny" {
 
 resource "aci_rest" "vzRsAnyToCons" {
   for_each   = toset(var.contract_consumers)
-  dn         = "${aci_rest.vzAny.id}/rsanyToCons-${each.value}"
+  dn         = "${aci_rest.vzAny.dn}/rsanyToCons-${each.value}"
   class_name = "vzRsAnyToCons"
   content = {
     "tnVzBrCPName" = each.value
@@ -30,7 +30,7 @@ resource "aci_rest" "vzRsAnyToCons" {
 
 resource "aci_rest" "vzRsAnyToProv" {
   for_each   = toset(var.contract_providers)
-  dn         = "${aci_rest.vzAny.id}/rsanyToProv-${each.value}"
+  dn         = "${aci_rest.vzAny.dn}/rsanyToProv-${each.value}"
   class_name = "vzRsAnyToProv"
   content = {
     "tnVzBrCPName" = each.value
@@ -39,7 +39,7 @@ resource "aci_rest" "vzRsAnyToProv" {
 
 resource "aci_rest" "vzRsAnyToConsIf" {
   for_each   = toset(var.contract_imported_consumers)
-  dn         = "${aci_rest.vzAny.id}/rsanyToConsIf-${each.value}"
+  dn         = "${aci_rest.vzAny.dn}/rsanyToConsIf-${each.value}"
   class_name = "vzRsAnyToConsIf"
   content = {
     "tnVzCPIfName" = each.value
@@ -47,7 +47,7 @@ resource "aci_rest" "vzRsAnyToConsIf" {
 }
 
 resource "aci_rest" "fvRsBgpCtxPol" {
-  dn         = "${aci_rest.fvCtx.id}/rsbgpCtxPol"
+  dn         = "${aci_rest.fvCtx.dn}/rsbgpCtxPol"
   class_name = "fvRsBgpCtxPol"
   content = {
     tnBgpCtxPolName = var.bgp_timer_policy
@@ -56,7 +56,7 @@ resource "aci_rest" "fvRsBgpCtxPol" {
 
 resource "aci_rest" "dnsLbl" {
   for_each   = toset(var.dns_labels)
-  dn         = "${aci_rest.fvCtx.id}/dnslbl-${each.value}"
+  dn         = "${aci_rest.fvCtx.dn}/dnslbl-${each.value}"
   class_name = "dnsLbl"
   content = {
     name = each.value
