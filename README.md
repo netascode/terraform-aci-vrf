@@ -13,7 +13,7 @@ Location in GUI:
 ```hcl
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.0.2"
+  version = ">= 0.1.0"
 
   tenant                      = "ABC"
   name                        = "VRF1"
@@ -28,7 +28,6 @@ module "aci_vrf" {
   contract_providers          = ["CON1"]
   contract_imported_consumers = ["I_CON1"]
 }
-
 ```
 
 ## Requirements
@@ -36,13 +35,13 @@ module "aci_vrf" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 0.2.0 |
+| <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 0.2.0 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.0.0 |
 
 ## Inputs
 
@@ -72,11 +71,11 @@ module "aci_vrf" {
 
 | Name | Type |
 |------|------|
-| [aci_rest.dnsLbl](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.fvCtx](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.fvRsBgpCtxPol](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.vzAny](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.vzRsAnyToCons](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.vzRsAnyToConsIf](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
-| [aci_rest.vzRsAnyToProv](https://registry.terraform.io/providers/netascode/aci/latest/docs/resources/rest) | resource |
+| [aci_rest_managed.dnsLbl](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.fvCtx](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.fvRsBgpCtxPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.vzAny](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.vzRsAnyToCons](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.vzRsAnyToConsIf](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.vzRsAnyToProv](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 <!-- END_TF_DOCS -->

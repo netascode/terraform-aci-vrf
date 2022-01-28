@@ -5,13 +5,13 @@ terraform {
     }
 
     aci = {
-      source  = "netascode/aci"
-      version = ">=0.2.0"
+      source  = "CiscoDevNet/aci"
+      version = ">=2.0.0"
     }
   }
 }
 
-resource "aci_rest" "fvTenant" {
+resource "aci_rest_managed" "fvTenant" {
   dn         = "uni/tn-TF"
   class_name = "fvTenant"
 }
@@ -19,7 +19,7 @@ resource "aci_rest" "fvTenant" {
 module "main" {
   source = "../.."
 
-  tenant                      = aci_rest.fvTenant.content.name
+  tenant                      = aci_rest_managed.fvTenant.content.name
   name                        = "VRF1"
   alias                       = "VRF1-ALIAS"
   description                 = "My Description"
@@ -33,8 +33,8 @@ module "main" {
   contract_imported_consumers = ["I_CON1"]
 }
 
-data "aci_rest" "fvCtx" {
-  dn = "uni/tn-${aci_rest.fvTenant.content.name}/ctx-${module.main.name}"
+data "aci_rest_managed" "fvCtx" {
+  dn = "uni/tn-${aci_rest_managed.fvTenant.content.name}/ctx-${module.main.name}"
 
   depends_on = [module.main]
 }
@@ -44,43 +44,43 @@ resource "test_assertions" "fvCtx" {
 
   equal "name" {
     description = "name"
-    got         = data.aci_rest.fvCtx.content.name
+    got         = data.aci_rest_managed.fvCtx.content.name
     want        = module.main.name
   }
 
   equal "nameAlias" {
     description = "nameAlias"
-    got         = data.aci_rest.fvCtx.content.nameAlias
+    got         = data.aci_rest_managed.fvCtx.content.nameAlias
     want        = "VRF1-ALIAS"
   }
 
   equal "descr" {
     description = "descr"
-    got         = data.aci_rest.fvCtx.content.descr
+    got         = data.aci_rest_managed.fvCtx.content.descr
     want        = "My Description"
   }
 
   equal "ipDataPlaneLearning" {
     description = "ipDataPlaneLearning"
-    got         = data.aci_rest.fvCtx.content.ipDataPlaneLearning
+    got         = data.aci_rest_managed.fvCtx.content.ipDataPlaneLearning
     want        = "disabled"
   }
 
   equal "pcEnfDir" {
     description = "pcEnfDir"
-    got         = data.aci_rest.fvCtx.content.pcEnfDir
+    got         = data.aci_rest_managed.fvCtx.content.pcEnfDir
     want        = "egress"
   }
 
   equal "pcEnfPref" {
     description = "pcEnfPref"
-    got         = data.aci_rest.fvCtx.content.pcEnfPref
+    got         = data.aci_rest_managed.fvCtx.content.pcEnfPref
     want        = "unenforced"
   }
 }
 
-data "aci_rest" "vzRsAnyToCons" {
-  dn = "${data.aci_rest.fvCtx.id}/any/rsanyToCons-CON1"
+data "aci_rest_managed" "vzRsAnyToCons" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/any/rsanyToCons-CON1"
 
   depends_on = [module.main]
 }
@@ -90,13 +90,13 @@ resource "test_assertions" "vzRsAnyToCons" {
 
   equal "tnVzBrCPName" {
     description = "tnVzBrCPName"
-    got         = data.aci_rest.vzRsAnyToCons.content.tnVzBrCPName
+    got         = data.aci_rest_managed.vzRsAnyToCons.content.tnVzBrCPName
     want        = "CON1"
   }
 }
 
-data "aci_rest" "vzRsAnyToProv" {
-  dn = "${data.aci_rest.fvCtx.id}/any/rsanyToProv-CON1"
+data "aci_rest_managed" "vzRsAnyToProv" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/any/rsanyToProv-CON1"
 
   depends_on = [module.main]
 }
@@ -106,13 +106,13 @@ resource "test_assertions" "vzRsAnyToProv" {
 
   equal "tnVzBrCPName" {
     description = "tnVzBrCPName"
-    got         = data.aci_rest.vzRsAnyToProv.content.tnVzBrCPName
+    got         = data.aci_rest_managed.vzRsAnyToProv.content.tnVzBrCPName
     want        = "CON1"
   }
 }
 
-data "aci_rest" "vzRsAnyToConsIf" {
-  dn = "${data.aci_rest.fvCtx.id}/any/rsanyToConsIf-I_CON1"
+data "aci_rest_managed" "vzRsAnyToConsIf" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/any/rsanyToConsIf-I_CON1"
 
   depends_on = [module.main]
 }
@@ -122,13 +122,13 @@ resource "test_assertions" "vzRsAnyToConsIf" {
 
   equal "tnVzCPIfName" {
     description = "tnVzCPIfName"
-    got         = data.aci_rest.vzRsAnyToConsIf.content.tnVzCPIfName
+    got         = data.aci_rest_managed.vzRsAnyToConsIf.content.tnVzCPIfName
     want        = "I_CON1"
   }
 }
 
-data "aci_rest" "fvRsBgpCtxPol" {
-  dn = "${data.aci_rest.fvCtx.id}/rsbgpCtxPol"
+data "aci_rest_managed" "fvRsBgpCtxPol" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/rsbgpCtxPol"
 
   depends_on = [module.main]
 }
@@ -138,13 +138,13 @@ resource "test_assertions" "fvRsBgpCtxPol" {
 
   equal "tnBgpCtxPolName" {
     description = "tnBgpCtxPolName"
-    got         = data.aci_rest.fvRsBgpCtxPol.content.tnBgpCtxPolName
+    got         = data.aci_rest_managed.fvRsBgpCtxPol.content.tnBgpCtxPolName
     want        = "BGP1"
   }
 }
 
-data "aci_rest" "dnsLbl" {
-  dn = "${data.aci_rest.fvCtx.id}/dnslbl-DNS1"
+data "aci_rest_managed" "dnsLbl" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/dnslbl-DNS1"
 
   depends_on = [module.main]
 }
@@ -154,7 +154,7 @@ resource "test_assertions" "dnsLbl" {
 
   equal "name" {
     description = "name"
-    got         = data.aci_rest.dnsLbl.content.name
+    got         = data.aci_rest_managed.dnsLbl.content.name
     want        = "DNS1"
   }
 }
