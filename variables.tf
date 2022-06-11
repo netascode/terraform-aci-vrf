@@ -68,6 +68,12 @@ variable "data_plane_learning" {
   default     = true
 }
 
+variable "preferred_group" {
+  description = "VRF preferred group member."
+  type        = bool
+  default     = false
+}
+
 variable "bgp_timer_policy" {
   description = "VRF BGP timer policy name."
   type        = string

@@ -14,7 +14,7 @@ Note that this example will create resources. Resources can be destroyed with `t
 ```hcl
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.1.0"
+  version = ">= 0.1.1"
 
   tenant                      = "ABC"
   name                        = "VRF1"
@@ -23,6 +23,7 @@ module "aci_vrf" {
   enforcement_direction       = "egress"
   enforcement_preference      = "unenforced"
   data_plane_learning         = false
+  preferred_group             = true
   bgp_timer_policy            = "BGP1"
   dns_labels                  = ["DNS1"]
   contract_consumers          = ["CON1"]

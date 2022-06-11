@@ -26,6 +26,7 @@ module "main" {
   enforcement_direction       = "egress"
   enforcement_preference      = "unenforced"
   data_plane_learning         = false
+  preferred_group             = true
   bgp_timer_policy            = "BGP1"
   dns_labels                  = ["DNS1"]
   contract_consumers          = ["CON1"]
@@ -76,6 +77,22 @@ resource "test_assertions" "fvCtx" {
     description = "pcEnfPref"
     got         = data.aci_rest_managed.fvCtx.content.pcEnfPref
     want        = "unenforced"
+  }
+}
+
+data "aci_rest_managed" "vzAny" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/any"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "vzAny" {
+  component = "vzAny"
+
+  equal "prefGrMemb" {
+    description = "prefGrMemb"
+    got         = data.aci_rest_managed.vzAny.content.prefGrMemb
+    want        = "enabled"
   }
 }
 

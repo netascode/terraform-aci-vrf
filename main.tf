@@ -15,7 +15,8 @@ resource "aci_rest_managed" "vzAny" {
   dn         = "${aci_rest_managed.fvCtx.dn}/any"
   class_name = "vzAny"
   content = {
-    "descr" = ""
+    "descr"      = ""
+    "prefGrMemb" = var.preferred_group == true ? "enabled" : "disabled"
   }
 }
 

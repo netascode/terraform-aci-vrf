@@ -13,7 +13,7 @@ Location in GUI:
 ```hcl
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.1.0"
+  version = ">= 0.1.1"
 
   tenant                      = "ABC"
   name                        = "VRF1"
@@ -22,6 +22,7 @@ module "aci_vrf" {
   enforcement_direction       = "egress"
   enforcement_preference      = "unenforced"
   data_plane_learning         = false
+  preferred_group             = true
   bgp_timer_policy            = "BGP1"
   dns_labels                  = ["DNS1"]
   contract_consumers          = ["CON1"]
@@ -54,6 +55,7 @@ module "aci_vrf" {
 | <a name="input_enforcement_direction"></a> [enforcement\_direction](#input\_enforcement\_direction) | VRF enforcement direction. Choices: `ingress`, `egress`. | `string` | `"ingress"` | no |
 | <a name="input_enforcement_preference"></a> [enforcement\_preference](#input\_enforcement\_preference) | VRF enforcement preference. Choices: `enforced`, `unenforced`. | `string` | `"enforced"` | no |
 | <a name="input_data_plane_learning"></a> [data\_plane\_learning](#input\_data\_plane\_learning) | VRF data plane learning. | `bool` | `true` | no |
+| <a name="input_preferred_group"></a> [preferred\_group](#input\_preferred\_group) | VRF preferred group member. | `bool` | `false` | no |
 | <a name="input_bgp_timer_policy"></a> [bgp\_timer\_policy](#input\_bgp\_timer\_policy) | VRF BGP timer policy name. | `string` | `""` | no |
 | <a name="input_dns_labels"></a> [dns\_labels](#input\_dns\_labels) | List of VRF DNS labels. | `list(string)` | `[]` | no |
 | <a name="input_contract_consumers"></a> [contract\_consumers](#input\_contract\_consumers) | List of contract consumers. | `list(string)` | `[]` | no |
