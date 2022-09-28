@@ -47,10 +47,10 @@ jobs:
         run: terraform test -junit-xml=test-report.xml
 
       - name: Publish Integration Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: test-report.xml
+          junit_files: test-report.xml
           check_name: 'Integration Test Results'
 
       - name: Webex Notification
