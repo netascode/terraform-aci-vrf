@@ -67,7 +67,7 @@ resource "aci_rest_managed" "fvRsCtxToBgpCtxAfPol_ipv4" {
 
 resource "aci_rest_managed" "fvRsCtxToBgpCtxAfPol_ipv6" {
   count      = var.ipv6_address_family_context_policy != "" ? 1 : 0
-  dn         = "${aci_rest_managed.fvCtx.dn}/rsctxToBgpCtxAfPol-${var.ipv6_address_family_context_policy}-ipv4-ucast"
+  dn         = "${aci_rest_managed.fvCtx.dn}/rsctxToBgpCtxAfPol-${var.ipv6_address_family_context_policy}-ipv6-ucast"
   class_name = "fvRsCtxToBgpCtxAfPol"
   content = {
     af                = "ipv6-ucast"
