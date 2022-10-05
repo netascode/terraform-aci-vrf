@@ -175,13 +175,13 @@ resource "test_assertions" "fvRsCtxToBgpCtxAfPol_ipv4" {
 
   equal "af" {
     description = "af"
-    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol.content.af
+    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv4.content.af
     want        = "ipv4-ucast"
   }
 
   equal "tnBgpCtxAfPolName" {
     description = "tnBgpCtxAfPolName"
-    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol.content.tnBgpCtxAfPolName
+    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv4.content.tnBgpCtxAfPolName
     want        = "BGP_AF_IPV4"
   }
 }
@@ -198,13 +198,13 @@ resource "test_assertions" "fvRsCtxToBgpCtxAfPol_ipv6" {
 
   equal "af" {
     description = "af"
-    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol.content.af
+    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv6.content.af
     want        = "ipv6-ucast"
   }
 
   equal "tnBgpCtxAfPolName" {
     description = "tnBgpCtxAfPolName"
-    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol.content.tnBgpCtxAfPolName
+    got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv6.content.tnBgpCtxAfPolName
     want        = "BGP_AF_IPV6"
   }
 }
