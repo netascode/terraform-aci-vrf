@@ -85,7 +85,7 @@ variable "bgp_timer_policy" {
   }
 }
 
-variable "ipv4_address_family_context_policy" {
+variable "bgp_ipv4_address_family_context_policy" {
   description = "VRF BGP IPV4 Address Family Context policy name."
   type        = string
   default     = ""
@@ -96,7 +96,7 @@ variable "ipv4_address_family_context_policy" {
   }
 }
 
-variable "ipv6_address_family_context_policy" {
+variable "bgp_ipv6_address_family_context_policy" {
   description = "VRF BGP IPV6 Address Family Context policy name."
   type        = string
   default     = ""
