@@ -85,6 +85,29 @@ variable "bgp_timer_policy" {
   }
 }
 
+variable "bgp_ipv4_address_family_context_policy" {
+  description = "VRF BGP IPV4 Address Family Context policy name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.bgp_ipv4_address_family_context_policy))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "bgp_ipv6_address_family_context_policy" {
+  description = "VRF BGP IPV6 Address Family Context policy name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.bgp_ipv6_address_family_context_policy))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+
 variable "dns_labels" {
   description = "List of VRF DNS labels."
   type        = list(string)
