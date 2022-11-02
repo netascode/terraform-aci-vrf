@@ -13,7 +13,7 @@ Location in GUI:
 ```hcl
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.1.1"
+  version = ">= 0.1.4"
 
   tenant                                 = "ABC"
   name                                   = "VRF1"
@@ -30,6 +30,26 @@ module "aci_vrf" {
   contract_consumers                     = ["CON1"]
   contract_providers                     = ["CON1"]
   contract_imported_consumers            = ["I_CON1"]
+  leaked_internal_prefixes = [{
+    prefix = "1.1.1.0/24"
+    public = true
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "ABC"
+      vrf         = "VRF2"
+      public      = false
+    }]
+  }]
+  leaked_external_prefixes = [{
+    prefix             = "2.2.0.0/16"
+    from_prefix_length = 24
+    to_prefix_length   = 32
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "ABC"
+      vrf         = "VRF2"
+    }]
+  }]
 }
 ```
 
@@ -74,6 +94,8 @@ module "aci_vrf" {
 | <a name="input_pim_resource_policy_multicast_route_map"></a> [pim\_resource\_policy\_multicast\_route\_map](#input\_pim\_resource\_policy\_multicast\_route\_map) | VRF PIM Resource Policy Multicast Route Map. | `string` | `""` | no |
 | <a name="input_pim_static_rps"></a> [pim\_static\_rps](#input\_pim\_static\_rps) | VRF PIM Static RPs. | <pre>list(object({<br>    ip                  = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
 | <a name="input_pim_fabric_rps"></a> [pim\_fabric\_rps](#input\_pim\_fabric\_rps) | VRF PIM Fabric RPs. | <pre>list(object({<br>    ip                  = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
+| <a name="input_leaked_internal_prefixes"></a> [leaked\_internal\_prefixes](#input\_leaked\_internal\_prefixes) | List of leaked internal prefixes. Default value `public`: false. | <pre>list(object({<br>    prefix = string<br>    public = optional(bool, false)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>      public      = optional(bool)<br>    })), [])<br>  }))</pre> | `[]` | no |
+| <a name="input_leaked_external_prefixes"></a> [leaked\_external\_prefixes](#input\_leaked\_external\_prefixes) | List of leaked external prefixes. | <pre>list(object({<br>    prefix             = string<br>    from_prefix_length = optional(number)<br>    to_prefix_length   = optional(number)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>    })), [])<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 
@@ -102,6 +124,11 @@ module "aci_vrf" {
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.leakExternalPrefix](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.leakInternalSubnet](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.leakRoutes](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.leakTo_external](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.leakTo_internal](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzAny](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzRsAnyToCons](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzRsAnyToConsIf](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

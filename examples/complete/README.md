@@ -14,7 +14,7 @@ Note that this example will create resources. Resources can be destroyed with `t
 ```hcl
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.1.1"
+  version = ">= 0.1.4"
 
   tenant                                 = "ABC"
   name                                   = "VRF1"
@@ -31,6 +31,26 @@ module "aci_vrf" {
   contract_consumers                     = ["CON1"]
   contract_providers                     = ["CON1"]
   contract_imported_consumers            = ["I_CON1"]
+  leaked_internal_prefixes = [{
+    prefix = "1.1.1.0/24"
+    public = true
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "ABC"
+      vrf         = "VRF2"
+      public      = false
+    }]
+  }]
+  leaked_external_prefixes = [{
+    prefix             = "2.2.0.0/16"
+    from_prefix_length = 24
+    to_prefix_length   = 32
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "ABC"
+      vrf         = "VRF2"
+    }]
+  }]
 }
 ```
 <!-- END_TF_DOCS -->

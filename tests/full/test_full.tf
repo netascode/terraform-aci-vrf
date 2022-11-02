@@ -62,6 +62,26 @@ module "main" {
       multicast_route_map = "TEST_RP"
     }
   ]
+  leaked_internal_prefixes = [{
+    prefix = "1.1.1.0/24"
+    public = true
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "TF"
+      vrf         = "VRF2"
+      public      = false
+    }]
+  }]
+  leaked_external_prefixes = [{
+    prefix             = "2.2.0.0/16"
+    from_prefix_length = 24
+    to_prefix_length   = 32
+    destinations = [{
+      description = "Leak to VRF2"
+      tenant      = "TF"
+      vrf         = "VRF2"
+    }]
+  }]
 }
 
 data "aci_rest_managed" "fvCtx" {
@@ -235,7 +255,6 @@ resource "test_assertions" "fvRsCtxToBgpCtxAfPol_ipv6" {
   }
 }
 
-
 data "aci_rest_managed" "dnsLbl" {
   dn = "${data.aci_rest_managed.fvCtx.id}/dnslbl-DNS1"
 
@@ -252,12 +271,18 @@ resource "test_assertions" "dnsLbl" {
   }
 }
 
+<<<<<<< HEAD
 data "aci_rest_managed" "pimCtxP" {
   dn = "${data.aci_rest_managed.fvCtx.id}/pimctxp"
+=======
+data "aci_rest_managed" "leakInternalSubnet" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakintsubnet-[1.1.1.0/24]"
+>>>>>>> origin/main
 
   depends_on = [module.main]
 }
 
+<<<<<<< HEAD
 resource "test_assertions" "pimCtxP" {
   component = "pimCtxP"
 
@@ -278,10 +303,65 @@ resource "test_assertions" "pimCtxP" {
 
 data "aci_rest_managed" "pimResPol" {
   dn = "${data.aci_rest_managed.pimCtxP.id}/res"
+=======
+resource "test_assertions" "leakInternalSubnet" {
+  component = "leakInternalSubnet"
+
+  equal "ip" {
+    description = "ip"
+    got         = data.aci_rest_managed.leakInternalSubnet.content.ip
+    want        = "1.1.1.0/24"
+  }
+
+  equal "scope" {
+    description = "scope"
+    got         = data.aci_rest_managed.leakInternalSubnet.content.scope
+    want        = "public"
+  }
+}
+
+data "aci_rest_managed" "leakTo_internal" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakintsubnet-[1.1.1.0/24]/to-[TF]-[VRF2]"
 
   depends_on = [module.main]
 }
 
+resource "test_assertions" "leakTo_internal" {
+  component = "leakTo_internal"
+
+  equal "descr" {
+    description = "descr"
+    got         = data.aci_rest_managed.leakTo_internal.content.descr
+    want        = "Leak to VRF2"
+  }
+
+  equal "tenantName" {
+    description = "tenantName"
+    got         = data.aci_rest_managed.leakTo_internal.content.tenantName
+    want        = "TF"
+  }
+
+  equal "ctxName" {
+    description = "ctxName"
+    got         = data.aci_rest_managed.leakTo_internal.content.ctxName
+    want        = "VRF2"
+  }
+
+  equal "scope" {
+    description = "scope"
+    got         = data.aci_rest_managed.leakTo_internal.content.scope
+    want        = "private"
+  }
+}
+
+data "aci_rest_managed" "leakExternalPrefix" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakextsubnet-[2.2.0.0/16]"
+>>>>>>> origin/main
+
+  depends_on = [module.main]
+}
+
+<<<<<<< HEAD
 resource "test_assertions" "pimResPol" {
   component = "pimResPol"
 
@@ -300,3 +380,54 @@ resource "test_assertions" "pimResPol" {
 }
 
 
+=======
+resource "test_assertions" "leakExternalPrefix" {
+  component = "leakExternalPrefix"
+
+  equal "ip" {
+    description = "ip"
+    got         = data.aci_rest_managed.leakExternalPrefix.content.ip
+    want        = "2.2.0.0/16"
+  }
+
+  equal "le" {
+    description = "le"
+    got         = data.aci_rest_managed.leakExternalPrefix.content.le
+    want        = "32"
+  }
+
+  equal "ge" {
+    description = "ge"
+    got         = data.aci_rest_managed.leakExternalPrefix.content.ge
+    want        = "24"
+  }
+}
+
+data "aci_rest_managed" "leakTo_external" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakextsubnet-[2.2.0.0/16]/to-[TF]-[VRF2]"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "leakTo_external" {
+  component = "leakTo_external"
+
+  equal "descr" {
+    description = "descr"
+    got         = data.aci_rest_managed.leakTo_external.content.descr
+    want        = "Leak to VRF2"
+  }
+
+  equal "tenantName" {
+    description = "tenantName"
+    got         = data.aci_rest_managed.leakTo_external.content.tenantName
+    want        = "TF"
+  }
+
+  equal "ctxName" {
+    description = "ctxName"
+    got         = data.aci_rest_managed.leakTo_external.content.ctxName
+    want        = "VRF2"
+  }
+}
+>>>>>>> origin/main
