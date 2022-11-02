@@ -1,3 +1,7 @@
+## 0.1.5 (unreleased)
+
+- Fix validation for `prefix_length` attributes of leaked external prefix
+
 ## 0.1.4
 
 - Add support for leaked internal and external prefixes

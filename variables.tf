@@ -212,14 +212,14 @@ variable "leaked_external_prefixes" {
 
   validation {
     condition = alltrue([
-      for p in var.leaked_external_prefixes : p.from_prefix_length == null || (p.from_prefix_length >= 0 && p.from_prefix_length <= 128)
+      for p in var.leaked_external_prefixes : p.from_prefix_length == null || try(p.from_prefix_length >= 0 && p.from_prefix_length <= 128, false)
     ])
     error_message = "Allowed values `from_prefix_length`: 0-128."
   }
 
   validation {
     condition = alltrue([
-      for p in var.leaked_external_prefixes : p.to_prefix_length == null || (p.to_prefix_length >= 0 && p.to_prefix_length <= 128)
+      for p in var.leaked_external_prefixes : p.to_prefix_length == null || try(p.to_prefix_length >= 0 && p.to_prefix_length <= 128, false)
     ])
     error_message = "Allowed values `to_prefix_length`: 0-128."
   }
