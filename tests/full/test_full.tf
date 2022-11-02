@@ -71,6 +71,14 @@ module "main" {
   asm_sg_expiry_multicast_route_map        = "TEST_RM"
   pim_asm_traffic_registry_max_rate        = 10
   pim_asm_traffic_registry_source_ip       = "1.1.1.1"
+  pim_ssm_group_range_multicast_route_map  = "TEST_RM"
+  pim_inter_vrf_policies = [
+    {
+      tenant              = "TEST_TEN"
+      vrf                 = "TEST_VRF"
+      multicast_route_map = "TEST_RM"
+    }
+  ]
   leaked_internal_prefixes = [{
     prefix = "1.1.1.0/24"
     public = true
@@ -507,6 +515,48 @@ resource "test_assertions" "pimRegTrPol" {
     description = "srcIp"
     got         = data.aci_rest_managed.pimRegTrPol.content.srcIp
     want        = "1.1.1.1"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/ssmpat/ssmrange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_ssm_range.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimInterVRFEntryPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/intervrf/intervrfent-[uni/tn-TEST_TEN/ctx-TEST_VRF]"
+}
+
+resource "test_assertions" "pimInterVRFEntryPol" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "srcVrfDn" {
+    description = "srcVrfDn"
+    got         = data.aci_rest_managed.pimInterVRFEntryPol.content.srcVrfDn
+    want        = "uni/tn-TEST_TEN/ctx-TEST_VRF"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  dn = "${data.aci_rest_managed.pimInterVRFEntryPol.dn}/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_pim_inter_vrf.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
   }
 }
 

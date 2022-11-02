@@ -105,6 +105,8 @@ module "aci_vrf" {
 | <a name="input_asm_sg_expiry_multicast_route_map"></a> [asm\_sg\_expiry\_multicast\_route\_map](#input\_asm\_sg\_expiry\_multicast\_route\_map) | VRF PIM Source-Group Expiry Multicast Route Map. | `string` | `""` | no |
 | <a name="input_pim_asm_traffic_registry_max_rate"></a> [pim\_asm\_traffic\_registry\_max\_rate](#input\_pim\_asm\_traffic\_registry\_max\_rate) | VRF PIM ASM TraffiC Registry Max Rate. Allowed values bewtween 1-65535. | `number` | `65535` | no |
 | <a name="input_pim_asm_traffic_registry_source_ip"></a> [pim\_asm\_traffic\_registry\_source\_ip](#input\_pim\_asm\_traffic\_registry\_source\_ip) | VRF PIM ASM Traffic Registry Source IP | `string` | `""` | no |
+| <a name="input_pim_ssm_group_range_multicast_route_map"></a> [pim\_ssm\_group\_range\_multicast\_route\_map](#input\_pim\_ssm\_group\_range\_multicast\_route\_map) | VRF PIM SSM Group Range Multicast Route Map | `string` | `""` | no |
+| <a name="input_pim_inter_vrf_policies"></a> [pim\_inter\_vrf\_policies](#input\_pim\_inter\_vrf\_policies) | VRF PIM Inter-VRF Policies | <pre>list(object({<br>    tenant              = string<br>    vrf                 = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
 | <a name="input_leaked_internal_prefixes"></a> [leaked\_internal\_prefixes](#input\_leaked\_internal\_prefixes) | List of leaked internal prefixes. Default value `public`: false. | <pre>list(object({<br>    prefix = string<br>    public = optional(bool, false)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>      public      = optional(bool)<br>    })), [])<br>  }))</pre> | `[]` | no |
 | <a name="input_leaked_external_prefixes"></a> [leaked\_external\_prefixes](#input\_leaked\_external\_prefixes) | List of leaked external prefixes. | <pre>list(object({<br>    prefix             = string<br>    from_prefix_length = optional(number)<br>    to_prefix_length   = optional(number)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>    })), [])<br>  }))</pre> | `[]` | no |
 
@@ -135,12 +137,16 @@ module "aci_vrf" {
 | [aci_rest_managed.pimBSRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimCtxP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimFabricRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimInterVRFEntryPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimInterVRFPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimMAFilterPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimRPGrpRangePol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimRPGrpRangePol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimRegTrPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimResPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimSGRangeExpPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSSMPatPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSSMRangePol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimSharedRangePol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimStaticRPEntryPol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.pimStaticRPEntryPol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
@@ -151,6 +157,8 @@ module "aci_vrf" {
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_auto_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_bsr](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_pim_inter_vrf](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_ssm_range](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtdmcRsFilterToRtMapPol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzAny](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzRsAnyToCons](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

@@ -303,6 +303,51 @@ resource "aci_rest_managed" "pimRegTrPol" {
   }
 }
 
+resource "aci_rest_managed" "pimSSMPatPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/ssmpat"
+  class_name = "pimSSMPatPol"
+}
+
+resource "aci_rest_managed" "pimSSMRangePol" {
+  count      = var.pim_enabled == true && var.pim_ssm_group_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSSMPatPol[0].dn}/ssmrange"
+  class_name = "pimSSMRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  count      = var.pim_enabled == true && var.pim_ssm_group_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSSMRangePol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_ssm_group_range_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimInterVRFPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/intervrf"
+  class_name = "pimInterVRFPol"
+}
+
+resource "aci_rest_managed" "pimInterVRFEntryPol" {
+  for_each   = { for vrf_pol in var.pim_inter_vrf_policies : vrf_pol.vrf => vrf_pol if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimInterVRFPol[0].dn}/intervrfent-[uni/tn-${each.value.tenant}/ctx-${each.value.vrf}]"
+  class_name = "pimInterVRFEntryPol"
+  content = {
+    srcVrfDn = "uni/tn-${each.value.tenant}/ctx-${each.value.vrf}"
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  for_each   = { for vrf_pol in var.pim_inter_vrf_policies : vrf_pol.vrf => vrf_pol if var.pim_enabled == true && vrf_pol.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimInterVRFEntryPol[each.value.vrf].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}
+
 resource "aci_rest_managed" "leakRoutes" {
   count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_internal_prefixes) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.fvCtx.dn}/leakroutes"

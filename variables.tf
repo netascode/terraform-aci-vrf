@@ -270,6 +270,7 @@ variable "pim_bsr_filter_multicast_route_map" {
   description = "VRF PIM BSR Multicast Route Map."
   type        = string
   default     = ""
+
   validation {
     condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_bsr_filter_multicast_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
@@ -292,6 +293,7 @@ variable "pim_auto_rp_filter_multicast_route_map" {
   description = "VRF PIM Auto RP Multicast Route Map."
   type        = string
   default     = ""
+
   validation {
     condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_auto_rp_filter_multicast_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
@@ -302,6 +304,7 @@ variable "pim_asm_shared_range_multicast_route_map" {
   description = "VRF PIM ASM Shared Range Multicast Route Map."
   type        = string
   default     = ""
+
   validation {
     condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_asm_shared_range_multicast_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
@@ -312,6 +315,7 @@ variable "pim_asm_sg_expiry" {
   description = "VRF PIM ASM Source-Group Expiry timeout. Allowed values 180-604801 or `default-timeout`."
   type        = string
   default     = "default-timeout"
+
   validation {
     condition     = var.pim_asm_sg_expiry == "default-timeout" || try(tonumber(var.pim_asm_sg_expiry) >= 180 && tonumber(var.pim_asm_sg_expiry) <= 604801, false)
     error_message = "Allowed values between 180-604801 or `default-timeout`."
@@ -322,6 +326,7 @@ variable "asm_sg_expiry_multicast_route_map" {
   description = "VRF PIM Source-Group Expiry Multicast Route Map."
   type        = string
   default     = ""
+
   validation {
     condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.asm_sg_expiry_multicast_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
@@ -332,6 +337,7 @@ variable "pim_asm_traffic_registry_max_rate" {
   description = "VRF PIM ASM TraffiC Registry Max Rate. Allowed values bewtween 1-65535."
   type        = number
   default     = 65535
+
   validation {
     condition     = var.pim_asm_traffic_registry_max_rate >= 1 && var.pim_asm_traffic_registry_max_rate <= 65535
     error_message = "Allowed values bewtween 1-65535."
@@ -342,6 +348,55 @@ variable "pim_asm_traffic_registry_source_ip" {
   description = "VRF PIM ASM Traffic Registry Source IP"
   type        = string
   default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_asm_traffic_registry_source_ip))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+
+variable "pim_ssm_group_range_multicast_route_map" {
+  description = "VRF PIM SSM Group Range Multicast Route Map"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_ssm_group_range_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "pim_inter_vrf_policies" {
+  description = "VRF PIM Inter-VRF Policies"
+  type = list(object({
+    tenant              = string
+    vrf                 = string
+    multicast_route_map = optional(string, "")
+  }))
+
+  validation {
+    condition = alltrue([
+      for pol in var.pim_inter_vrf_policies : can(regex("^[a-zA-Z0-9_.-]{0,64}$", pol.tenant))
+    ])
+    error_message = "`tenant`. Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+
+  validation {
+    condition = alltrue([
+      for pol in var.pim_inter_vrf_policies : can(regex("^[a-zA-Z0-9_.-]{0,64}$", pol.vrf))
+    ])
+    error_message = "`vrf`. Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+
+  validation {
+    condition = alltrue([
+      for pol in var.pim_inter_vrf_policies : can(regex("^[a-zA-Z0-9_.-]{0,64}$", pol.multicast_route_map))
+    ])
+    error_message = "`multicast_route_map`. Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+
+  default = []
 }
 
 variable "leaked_internal_prefixes" {
