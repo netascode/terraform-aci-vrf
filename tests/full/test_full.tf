@@ -271,18 +271,12 @@ resource "test_assertions" "dnsLbl" {
   }
 }
 
-<<<<<<< HEAD
 data "aci_rest_managed" "pimCtxP" {
   dn = "${data.aci_rest_managed.fvCtx.id}/pimctxp"
-=======
-data "aci_rest_managed" "leakInternalSubnet" {
-  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakintsubnet-[1.1.1.0/24]"
->>>>>>> origin/main
 
   depends_on = [module.main]
 }
 
-<<<<<<< HEAD
 resource "test_assertions" "pimCtxP" {
   component = "pimCtxP"
 
@@ -300,10 +294,33 @@ resource "test_assertions" "pimCtxP" {
 
 }
 
-
 data "aci_rest_managed" "pimResPol" {
   dn = "${data.aci_rest_managed.pimCtxP.id}/res"
-=======
+}
+
+resource "test_assertions" "pimResPol" {
+  component = "pimResPol"
+
+  equal "max" {
+    description = "max"
+    got         = data.aci_rest_managed.pimResPol.content.max
+    want        = "1000"
+  }
+
+  equal "rsvd" {
+    description = "rsvd"
+    got         = data.aci_rest_managed.pimResPol.content.rsvd
+    want        = "undefined"
+  }
+
+}
+
+data "aci_rest_managed" "leakInternalSubnet" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakintsubnet-[1.1.1.0/24]"
+
+  depends_on = [module.main]
+}
+
 resource "test_assertions" "leakInternalSubnet" {
   component = "leakInternalSubnet"
 
@@ -356,31 +373,10 @@ resource "test_assertions" "leakTo_internal" {
 
 data "aci_rest_managed" "leakExternalPrefix" {
   dn = "${data.aci_rest_managed.fvCtx.id}/leakroutes/leakextsubnet-[2.2.0.0/16]"
->>>>>>> origin/main
 
   depends_on = [module.main]
 }
 
-<<<<<<< HEAD
-resource "test_assertions" "pimResPol" {
-  component = "pimResPol"
-
-  equal "max" {
-    description = "max"
-    got         = data.aci_rest_managed.pimResPol.content.max
-    want        = "1000"
-  }
-
-  equal "rsvd" {
-    description = "rsvd"
-    got         = data.aci_rest_managed.pimResPol.content.rsvd
-    want        = "undefined"
-  }
-
-}
-
-
-=======
 resource "test_assertions" "leakExternalPrefix" {
   component = "leakExternalPrefix"
 
@@ -430,4 +426,3 @@ resource "test_assertions" "leakTo_external" {
     want        = "VRF2"
   }
 }
->>>>>>> origin/main
