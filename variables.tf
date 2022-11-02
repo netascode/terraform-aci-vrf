@@ -255,37 +255,91 @@ variable "pim_fabric_rps" {
 }
 
 variable "pim_bsr_forward_updates" {
-  description = "VRF PIM BSR Forward Updates flag"
+  description = "VRF PIM BSR Forward Updates flag."
   type        = bool
   default     = false
 }
 
 variable "pim_bsr_listen_updates" {
-  description = "VRF PIM BSR Listen Updates flag"
+  description = "VRF PIM BSR Listen Updates flag."
   type        = bool
   default     = false
 }
 
 variable "pim_bsr_filter_multicast_route_map" {
-  description = "VRF PIM BSR Multicast Route Map"
+  description = "VRF PIM BSR Multicast Route Map."
   type        = string
   default     = ""
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_bsr_filter_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
 }
 
 variable "pim_auto_rp_forward_updates" {
-  description = "VRF PIM Auto RP Forward Updates flag"
+  description = "VRF PIM Auto RP Forward Updates flag."
   type        = bool
   default     = false
 }
 
 variable "pim_auto_rp_listen_updates" {
-  description = "VRF PIM Auto RP Listen Updates flag"
+  description = "VRF PIM Auto RP Listen Updates flag."
   type        = bool
   default     = false
 }
 
 variable "pim_auto_rp_filter_multicast_route_map" {
-  description = "VRF PIM Auto RP Multicast Route Map"
+  description = "VRF PIM Auto RP Multicast Route Map."
+  type        = string
+  default     = ""
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_auto_rp_filter_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "pim_asm_shared_range_multicast_route_map" {
+  description = "VRF PIM ASM Shared Range Multicast Route Map."
+  type        = string
+  default     = ""
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_asm_shared_range_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "pim_asm_sg_expiry" {
+  description = "VRF PIM ASM Source-Group Expiry timeout. Allowed values 180-604801 or `default-timeout`."
+  type        = string
+  default     = "default-timeout"
+  validation {
+    condition     = var.pim_asm_sg_expiry == "default-timeout" || try(tonumber(var.pim_asm_sg_expiry) >= 180 && tonumber(var.pim_asm_sg_expiry) <= 604801, false)
+    error_message = "Allowed values between 180-604801 or `default-timeout`."
+  }
+}
+
+variable "asm_sg_expiry_multicast_route_map" {
+  description = "VRF PIM Source-Group Expiry Multicast Route Map."
+  type        = string
+  default     = ""
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.asm_sg_expiry_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "pim_asm_traffic_registry_max_rate" {
+  description = "VRF PIM ASM TraffiC Registry Max Rate. Allowed values bewtween 1-65535."
+  type        = number
+  default     = 65535
+  validation {
+    condition     = var.pim_asm_traffic_registry_max_rate >= 1 && var.pim_asm_traffic_registry_max_rate <= 65535
+    error_message = "Allowed values bewtween 1-65535."
+  }
+}
+
+variable "pim_asm_traffic_registry_source_ip" {
+  description = "VRF PIM ASM Traffic Registry Source IP"
   type        = string
   default     = ""
 }

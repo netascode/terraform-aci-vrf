@@ -208,7 +208,7 @@ resource "aci_rest_managed" "pimBSRPPol" {
   dn         = "${aci_rest_managed.pimCtxP[0].dn}/bsrp"
   class_name = "pimBSRPPol"
   content = {
-    "ctrl" = join(",", concat(var.pim_bsr_forward_updates == true ? ["forward"] : [], var.pim_bsr_listen_updates == true ? ["listen"] : []))
+    ctrl = join(",", concat(var.pim_bsr_forward_updates == true ? ["forward"] : [], var.pim_bsr_listen_updates == true ? ["listen"] : []))
   }
 }
 
@@ -223,7 +223,7 @@ resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_bsr" {
   dn         = "${aci_rest_managed.pimBSRFilterPol[0].dn}/rsfilterToRtMapPol"
   class_name = "rtdmcRsFilterToRtMapPol"
   content = {
-    "tDn" = "uni/tn-${var.tenant}/rtmap-${var.pim_bsr_filter_multicast_route_map}"
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_bsr_filter_multicast_route_map}"
   }
 }
 
@@ -232,7 +232,7 @@ resource "aci_rest_managed" "pimAutoRPPol" {
   dn         = "${aci_rest_managed.pimCtxP[0].dn}/autorp"
   class_name = "pimAutoRPPol"
   content = {
-    "ctrl" = join(",", concat(var.pim_auto_rp_forward_updates == true ? ["forward"] : [], var.pim_auto_rp_listen_updates == true ? ["listen"] : []))
+    ctrl = join(",", concat(var.pim_auto_rp_forward_updates == true ? ["forward"] : [], var.pim_auto_rp_listen_updates == true ? ["listen"] : []))
   }
 }
 
@@ -247,7 +247,59 @@ resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_auto_rp" {
   dn         = "${aci_rest_managed.pimMAFilterPol[0].dn}/rsfilterToRtMapPol"
   class_name = "rtdmcRsFilterToRtMapPol"
   content = {
-    "tDn" = "uni/tn-${var.tenant}/rtmap-${var.pim_auto_rp_filter_multicast_route_map}"
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_auto_rp_filter_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimASMPatPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/asmpat"
+  class_name = "pimASMPatPol"
+  content = {
+    ctrl = ""
+  }
+}
+
+resource "aci_rest_managed" "pimSharedRangePol" {
+  count      = var.pim_enabled == true && var.pim_asm_shared_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/sharedrange"
+  class_name = "pimSharedRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  count      = var.pim_enabled == true && var.pim_asm_shared_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSharedRangePol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_asm_shared_range_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimSGRangeExpPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/sgrangeexp"
+  class_name = "pimSGRangeExpPol"
+  content = {
+    sgExpItvl = var.pim_asm_sg_expiry
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  count      = var.pim_enabled == true && var.asm_sg_expiry_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSGRangeExpPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.asm_sg_expiry_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimRegTrPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/regtr"
+  class_name = "pimRegTrPol"
+  content = {
+    maxRate = var.pim_asm_traffic_registry_max_rate
+    srcIp   = var.pim_asm_traffic_registry_source_ip
   }
 }
 

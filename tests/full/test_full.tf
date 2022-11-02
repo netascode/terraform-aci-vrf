@@ -60,12 +60,17 @@ module "main" {
       ip = "2.2.2.2"
     }
   ]
-  pim_bsr_listen_updates                 = true
-  pim_bsr_forward_updates                = true
-  pim_bsr_filter_multicast_route_map     = "TEST_RM"
-  pim_auto_rp_listen_updates             = true
-  pim_auto_rp_forward_updates            = true
-  pim_auto_rp_filter_multicast_route_map = "TEST_RM"
+  pim_bsr_listen_updates                   = true
+  pim_bsr_forward_updates                  = true
+  pim_bsr_filter_multicast_route_map       = "TEST_RM"
+  pim_auto_rp_listen_updates               = true
+  pim_auto_rp_forward_updates              = true
+  pim_auto_rp_filter_multicast_route_map   = "TEST_RM"
+  pim_asm_shared_range_multicast_route_map = "TEST_RM"
+  pim_asm_sg_expiry                        = 1800
+  asm_sg_expiry_multicast_route_map        = "TEST_RM"
+  pim_asm_traffic_registry_max_rate        = 10
+  pim_asm_traffic_registry_source_ip       = "1.1.1.1"
   leaked_internal_prefixes = [{
     prefix = "1.1.1.0/24"
     public = true
@@ -355,7 +360,7 @@ resource "test_assertions" "pimStaticRPEntryPol_fabric_rp" {
   equal "rpIp" {
     description = "rpIp"
     got         = data.aci_rest_managed.pimStaticRPEntryPol_fabric_rp.content.rpIp
-    want        = "2.2.2.2"
+    want        = "2.2.2.1"
   }
 }
 
@@ -401,7 +406,6 @@ resource "test_assertions" "rtdmcRsFilterToRtMapPol_bsr" {
   }
 }
 
-
 data "aci_rest_managed" "pimAutoRPPol" {
   dn = "${data.aci_rest_managed.pimCtxP.dn}/autorp"
 }
@@ -427,6 +431,82 @@ resource "test_assertions" "rtdmcRsFilterToRtMapPol_auto_rp" {
     description = "tDn"
     got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_auto_rp.content.tDn
     want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimASMPatPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/asmpat"
+}
+
+resource "test_assertions" "pimASMPatPol" {
+  component = "pimASMPatPol"
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimASMPatPol.content.ctrl
+    want        = ""
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/sharedrange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_shared.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimSGRangeExpPol" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/sgrangeexp"
+}
+
+resource "test_assertions" "pimSGRangeExpPol" {
+  component = "pimSGRangeExpPol"
+
+  equal "sgExpItvl" {
+    description = "sgExpItvl"
+    got         = data.aci_rest_managed.pimSGRangeExpPol.content.sgExpItvl
+    want        = "1800"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  dn = "${data.aci_rest_managed.pimSGRangeExpPol.dn}/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_sg_expiry.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimRegTrPol" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/regtr"
+}
+
+resource "test_assertions" "pimRegTrPol" {
+  component = "pimRegTrPol"
+
+  equal "maxRate" {
+    description = "maxRate"
+    got         = data.aci_rest_managed.pimRegTrPol.content.maxRate
+    want        = "10"
+  }
+
+  equal "srcIp" {
+    description = "srcIp"
+    got         = data.aci_rest_managed.pimRegTrPol.content.srcIp
+    want        = "1.1.1.1"
   }
 }
 
