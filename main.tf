@@ -202,6 +202,55 @@ resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_fabric_rp" {
     tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
   }
 }
+
+resource "aci_rest_managed" "pimBSRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/bsrp"
+  class_name = "pimBSRPPol"
+  content = {
+    "ctrl" = join(",", concat(var.pim_bsr_forward_updates == true ? ["forward"] : [], var.pim_bsr_listen_updates == true ? ["listen"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimBSRFilterPol" {
+  count      = var.pim_enabled == true && var.pim_bsr_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimBSRPPol[0].dn}/bsfilter"
+  class_name = "pimBSRFilterPol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_bsr" {
+  count      = var.pim_enabled == true && var.pim_bsr_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimBSRFilterPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    "tDn" = "uni/tn-${var.tenant}/rtmap-${var.pim_bsr_filter_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimAutoRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/autorp"
+  class_name = "pimAutoRPPol"
+  content = {
+    "ctrl" = join(",", concat(var.pim_auto_rp_forward_updates == true ? ["forward"] : [], var.pim_auto_rp_listen_updates == true ? ["listen"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimMAFilterPol" {
+  count      = var.pim_enabled == true && var.pim_auto_rp_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimAutoRPPol[0].dn}/mafilter"
+  class_name = "pimMAFilterPol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_auto_rp" {
+  count      = var.pim_enabled == true && var.pim_auto_rp_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimMAFilterPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    "tDn" = "uni/tn-${var.tenant}/rtmap-${var.pim_auto_rp_filter_multicast_route_map}"
+  }
+}
+
 resource "aci_rest_managed" "leakRoutes" {
   count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_internal_prefixes) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.fvCtx.dn}/leakroutes"

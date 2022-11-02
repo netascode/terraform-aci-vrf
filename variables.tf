@@ -238,7 +238,6 @@ variable "pim_static_rps" {
   default = []
 }
 
-
 variable "pim_fabric_rps" {
   description = "VRF PIM Fabric RPs."
   type = list(object({
@@ -254,6 +253,43 @@ variable "pim_fabric_rps" {
   }
   default = []
 }
+
+variable "pim_bsr_forward_updates" {
+  description = "VRF PIM BSR Forward Updates flag"
+  type        = bool
+  default     = false
+}
+
+variable "pim_bsr_listen_updates" {
+  description = "VRF PIM BSR Listen Updates flag"
+  type        = bool
+  default     = false
+}
+
+variable "pim_bsr_filter_multicast_route_map" {
+  description = "VRF PIM BSR Multicast Route Map"
+  type        = string
+  default     = ""
+}
+
+variable "pim_auto_rp_forward_updates" {
+  description = "VRF PIM Auto RP Forward Updates flag"
+  type        = bool
+  default     = false
+}
+
+variable "pim_auto_rp_listen_updates" {
+  description = "VRF PIM Auto RP Listen Updates flag"
+  type        = bool
+  default     = false
+}
+
+variable "pim_auto_rp_filter_multicast_route_map" {
+  description = "VRF PIM Auto RP Multicast Route Map"
+  type        = string
+  default     = ""
+}
+
 variable "leaked_internal_prefixes" {
   description = "List of leaked internal prefixes. Default value `public`: false."
   type = list(object({
