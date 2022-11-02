@@ -1,4 +1,4 @@
-## 0.1.5 (unreleased)
+## 0.1.5
 
 - Fix validation for `prefix_length` attributes of leaked external prefix
 
