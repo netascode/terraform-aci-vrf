@@ -83,3 +83,92 @@ resource "aci_rest_managed" "dnsLbl" {
     name = each.value
   }
 }
+
+resource "aci_rest_managed" "pimCtxP" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/pimctxp"
+  class_name = "pimCtxP"
+  content = {
+    mtu  = var.pim_mtu
+    ctrl = join(",", concat(var.pim_fast_convergence == true ? ["fast-conv"] : [], var.pim_strict_rfc == true ? ["strict-rfc-compliant"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimResPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/res"
+  class_name = "pimResPol"
+  content = {
+    max  = var.pim_max_multicast_entries
+    rsvd = var.pim_reserved_multicast_entries
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol" {
+  count      = var.pim_enabled == true && var.pim_resource_policy_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimResPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_resource_policy_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimStaticRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/staticrp"
+  class_name = "pimStaticRPPol"
+}
+
+resource "aci_rest_managed" "pimStaticRPEntryPol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimStaticRPPol[0].dn}/staticrpent-[${each.value.ip}]"
+  class_name = "pimStaticRPEntryPol"
+  content = {
+    rpIp = each.value.ip
+  }
+}
+
+resource "aci_rest_managed" "pimRPGrpRangePol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimStaticRPEntryPol_static_rp[each.value.ip].dn}/rpgrprange"
+  class_name = "pimRPGrpRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimRPGrpRangePol_static_rp[each.value.ip].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimFabricRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/fabricrp"
+  class_name = "pimFabricRPPol"
+}
+
+resource "aci_rest_managed" "pimStaticRPEntryPol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimFabricRPPol[0].dn}/staticrpent-[${each.value.ip}]"
+  class_name = "pimStaticRPEntryPol"
+  content = {
+    rpIp = each.value.ip
+  }
+}
+
+resource "aci_rest_managed" "pimRPGrpRangePol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimStaticRPEntryPol_fabric_rp[each.value.ip].dn}/rpgrprange"
+  class_name = "pimRPGrpRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimRPGrpRangePol_fabric_rp[each.value.ip].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}

@@ -36,6 +36,32 @@ module "main" {
   contract_consumers                     = ["CON1"]
   contract_providers                     = ["CON1"]
   contract_imported_consumers            = ["I_CON1"]
+  pim_enabled                            = true
+  pim_mtu                                = 9200
+  pim_fast_convergence                   = true
+  pim_strict_rfc                         = true
+  pim_max_multicast_entries              = 1000
+  pim_reserved_multicast_entries         = "undefined"
+  pim_static_rps = [
+    {
+      ip                  = "1.1.1.1"
+      multicast_route_map = "TEST_RP"
+    },
+    {
+      ip                  = "1.1.1.2"
+      multicast_route_map = "TEST_RP"
+    },
+  ]
+  pim_fabric_rps = [
+    {
+      ip                  = "2.2.2.1"
+      multicast_route_map = "TEST_RP"
+    },
+    {
+      ip                  = "2.2.2.2"
+      multicast_route_map = "TEST_RP"
+    }
+  ]
 }
 
 data "aci_rest_managed" "fvCtx" {
@@ -225,3 +251,52 @@ resource "test_assertions" "dnsLbl" {
     want        = "DNS1"
   }
 }
+
+data "aci_rest_managed" "pimCtxP" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/pimctxp"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "pimCtxP" {
+  component = "pimCtxP"
+
+  equal "mtu" {
+    description = "mtu"
+    got         = data.aci_rest_managed.pimCtxP.content.mtu
+    want        = "9200"
+  }
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimCtxP.content.ctrl
+    want        = "fast-conv,strict-rfc-compliant"
+  }
+
+}
+
+
+data "aci_rest_managed" "pimResPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.id}/res"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "pimResPol" {
+  component = "pimResPol"
+
+  equal "max" {
+    description = "max"
+    got         = data.aci_rest_managed.pimResPol.content.max
+    want        = "1000"
+  }
+
+  equal "rsvd" {
+    description = "rsvd"
+    got         = data.aci_rest_managed.pimResPol.content.rsvd
+    want        = "undefined"
+  }
+
+}
+
+

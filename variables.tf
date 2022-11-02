@@ -159,3 +159,98 @@ variable "contract_imported_consumers" {
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
   }
 }
+
+variable "pim_enabled" {
+  description = "VRF PIM."
+  type        = bool
+  default     = false
+}
+
+variable "pim_mtu" {
+  description = "VRF PIM MTU. Allowed values 1-9300."
+  type        = number
+  default     = 1500
+
+  validation {
+    condition     = var.pim_mtu >= 1 && var.pim_mtu <= 9300
+    error_message = "Allowed values 1-9300."
+  }
+}
+
+variable "pim_fast_convergence" {
+  description = "VRF PIM fast convergence."
+  type        = bool
+  default     = false
+}
+
+variable "pim_strict_rfc" {
+  description = "VRF PIM Strict RFC compliant."
+  type        = bool
+  default     = false
+}
+
+variable "pim_max_multicast_entries" {
+  description = "VRF Maximum number of multicast entries. Allowed valued between 1-4294967295."
+  type        = number
+  default     = 4294967295
+
+  validation {
+    condition     = var.pim_max_multicast_entries >= 1 && var.pim_max_multicast_entries <= 4294967295
+    error_message = "Allowed valued between 1-4294967295."
+  }
+}
+
+variable "pim_reserved_multicast_entries" {
+  description = "VRF PIM Maximum number of multicast entries. Allowed valued between 0-4294967295."
+  type        = string
+  default     = "undefined"
+
+  validation {
+    condition     = var.pim_reserved_multicast_entries == "undefined" || try(tonumber(var.pim_reserved_multicast_entries) >= 0 && tonumber(var.pim_reserved_multicast_entries) <= 4294967295, false)
+    error_message = "Allowed valued between 0-4294967295."
+  }
+}
+
+variable "pim_resource_policy_multicast_route_map" {
+  description = "VRF PIM Resource Policy Multicast Route Map."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_resource_policy_multicast_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "pim_static_rps" {
+  description = "VRF PIM Static RPs."
+  type = list(object({
+    ip                  = string
+    multicast_route_map = optional(string, "")
+  }))
+
+  validation {
+    condition = alltrue([
+      for rp in var.pim_static_rps : can(regex("^[a-zA-Z0-9_.-]{0,64}$", rp.multicast_route_map))
+    ])
+    error_message = "`multicast_route_map` Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+  default = []
+}
+
+
+variable "pim_fabric_rps" {
+  description = "VRF PIM Fabric RPs."
+  type = list(object({
+    ip                  = string
+    multicast_route_map = optional(string, "")
+  }))
+
+  validation {
+    condition = alltrue([
+      for rp in var.pim_fabric_rps : can(regex("^[a-zA-Z0-9_.-]{0,64}$", rp.multicast_route_map))
+    ])
+    error_message = "`multicast_route_map` Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+  default = []
+}
