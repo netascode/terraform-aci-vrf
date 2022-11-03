@@ -348,6 +348,23 @@ resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
   }
 }
 
+resource "aci_rest_managed" "igmpCtxP" {
+  count      = var.pim_enabled == true && length(var.pim_igmp_ssm_translate_policies) != 0 ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/igmpctxp"
+  class_name = "igmpCtxP"
+}
+
+resource "aci_rest_managed" "igmpSSMXlateP" {
+  for_each   = { for pol in var.pim_igmp_ssm_translate_policies : "${pol.group_prefix}-${pol.source_address}" => pol if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.igmpCtxP[0].dn}/ssmxlate-[${each.value.group_prefix}]-[${each.value.source_address}]"
+  class_name = "igmpSSMXlateP"
+  content = {
+    descr   = "${each.value.group_prefix}-${each.value.source_address}"
+    grpPfx  = each.value.group_prefix
+    srcAddr = each.value.source_address
+  }
+}
+
 resource "aci_rest_managed" "leakRoutes" {
   count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_internal_prefixes) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.fvCtx.dn}/leakroutes"

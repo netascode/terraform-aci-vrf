@@ -79,6 +79,16 @@ module "main" {
       multicast_route_map = "TEST_RM"
     }
   ]
+  pim_igmp_ssm_translate_policies = [
+    {
+      group_prefix   = "228.0.0.0/8"
+      source_address = "3.3.3.3"
+    },
+    {
+      group_prefix   = "229.0.0.0/8"
+      source_address = "4.4.4.4"
+    }
+  ]
   leaked_internal_prefixes = [{
     prefix = "1.1.1.0/24"
     public = true
@@ -557,6 +567,32 @@ resource "test_assertions" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
     description = "tDn"
     got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_pim_inter_vrf.content.tDn
     want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "igmpSSMXlateP" {
+  dn = "${data.aci_rest_managed.fvCtx.dn}/igmpctxp/ssmxlate-[228.0.0.0/8]-[3.3.3.3]"
+}
+
+resource "test_assertions" "igmpSSMXlateP" {
+  component = "igmpSSMXlateP"
+
+  equal "descr" {
+    description = "descr"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.descr
+    want        = "228.0.0.0/8-3.3.3.3"
+  }
+
+  equal "grpPfx" {
+    description = "grpPfx"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.grpPfx
+    want        = "228.0.0.0/8"
+  }
+
+  equal "srcAddr" {
+    description = "srcAddr"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.srcAddr
+    want        = "3.3.3.3"
   }
 }
 

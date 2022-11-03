@@ -399,6 +399,16 @@ variable "pim_inter_vrf_policies" {
   default = []
 }
 
+variable "pim_igmp_ssm_translate_policies" {
+  description = "VFF IGMP SSM Tranlate Policies"
+  type = list(object({
+    group_prefix   = string
+    source_address = string
+  }))
+
+  default = []
+
+}
 variable "leaked_internal_prefixes" {
   description = "List of leaked internal prefixes. Default value `public`: false."
   type = list(object({
