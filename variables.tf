@@ -195,7 +195,7 @@ variable "pim_max_multicast_entries" {
   default     = "unlimited"
 
   validation {
-    condition     = var.pim_max_multicast_entries == "unlimited" || try(tonumber(var.pim_max_multicast_entries) >= 1 && tobumber(var.pim_max_multicast_entries) <= 4294967295, false)
+    condition     = var.pim_max_multicast_entries == "unlimited" || try(tonumber(var.pim_max_multicast_entries) >= 1 && tonumber(var.pim_max_multicast_entries) <= 4294967295, false)
     error_message = "Allowed valued between `1`-`4294967295` or `unlimited`. Default value `unlimited."
   }
 }
