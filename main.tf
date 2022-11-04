@@ -115,7 +115,7 @@ resource "aci_rest_managed" "dnsLbl" {
 }
 
 resource "aci_rest_managed" "leakRoutes" {
-  count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_internal_prefixes) > 0 ? 1 : 0
+  count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_external_prefixes) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.fvCtx.dn}/leakroutes"
   class_name = "leakRoutes"
 }
