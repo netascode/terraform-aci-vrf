@@ -1,4 +1,4 @@
-## 0.2.1 (unreleased)
+## 0.2.1
 
 - BREAKING CHANGE: Rename `asm_sg_expiry_multicast_route_map` to `pim_asm_sg_expiry_multicast_route_map`
 
