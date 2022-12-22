@@ -132,14 +132,16 @@ resource "aci_rest_managed" "pimResPol" {
     max  = var.pim_max_multicast_entries
     rsvd = var.pim_reserved_multicast_entries
   }
-}
 
-resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol" {
-  count      = var.pim_enabled == true && var.pim_resource_policy_multicast_route_map != "" ? 1 : 0
-  dn         = "${aci_rest_managed.pimResPol[0].dn}/rsfilterToRtMapPol"
-  class_name = "rtdmcRsFilterToRtMapPol"
-  content = {
-    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_resource_policy_multicast_route_map}"
+  dynamic "child" {
+    for_each = var.pim_resource_policy_multicast_route_map != "" ? [0] : []
+    content {
+      rn         = "rsfilterToRtMapPol"
+      class_name = "rtdmcRsFilterToRtMapPol"
+      content = {
+        tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_resource_policy_multicast_route_map}"
+      }
+    }
   }
 }
 

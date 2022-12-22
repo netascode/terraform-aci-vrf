@@ -1,3 +1,7 @@
+## 0.2.2 (unreleased)
+
+- Fix configuration issue with reserved multicast entries and route maps
+
 ## 0.2.1
 
 - BREAKING CHANGE: Rename `asm_sg_expiry_multicast_route_map` to `pim_asm_sg_expiry_multicast_route_map`
