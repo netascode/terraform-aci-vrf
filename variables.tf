@@ -161,7 +161,7 @@ variable "contract_imported_consumers" {
 }
 
 variable "pim_enabled" {
-  description = "VRF PIM. Default value: `false`."
+  description = "Enable PIM. Default value: `false`."
   type        = bool
   default     = false
 }
@@ -190,7 +190,7 @@ variable "pim_strict_rfc" {
 }
 
 variable "pim_max_multicast_entries" {
-  description = "VRF Maximum number of multicast entries. Allowed valued between `1`-`4294967295` or `unlimited`. Default value `unlimited."
+  description = "VRF PIM maximum number of multicast entries. Allowed valued between `1`-`4294967295` or `unlimited`. Default value `unlimited."
   type        = string
   default     = "unlimited"
 
@@ -201,7 +201,7 @@ variable "pim_max_multicast_entries" {
 }
 
 variable "pim_reserved_multicast_entries" {
-  description = "VRF PIM Maximum number of multicast entries. Allowed valued between `0`-`4294967295`. Default value `undefined`"
+  description = "VRF PIM maximum number of multicast entries. Allowed valued between `0`-`4294967295`. Default value `undefined`"
   type        = string
   default     = "undefined"
 
@@ -212,7 +212,7 @@ variable "pim_reserved_multicast_entries" {
 }
 
 variable "pim_resource_policy_multicast_route_map" {
-  description = "VRF PIM Resource Policy Multicast Route Map."
+  description = "VRF PIM resource policy multicast route map."
   type        = string
   default     = ""
 
@@ -223,7 +223,7 @@ variable "pim_resource_policy_multicast_route_map" {
 }
 
 variable "pim_static_rps" {
-  description = "VRF PIM Static RPs."
+  description = "VRF PIM static RPs."
   type = list(object({
     ip                  = string
     multicast_route_map = optional(string, "")
@@ -239,7 +239,7 @@ variable "pim_static_rps" {
 }
 
 variable "pim_fabric_rps" {
-  description = "VRF PIM Fabric RPs."
+  description = "VRF PIM fabric RPs."
   type = list(object({
     ip                  = string
     multicast_route_map = optional(string, "")
@@ -255,19 +255,19 @@ variable "pim_fabric_rps" {
 }
 
 variable "pim_bsr_forward_updates" {
-  description = "VRF PIM BSR Forward Updates flag. Default value: `false`."
+  description = "VRF PIM BSR forward updates flag. Default value: `false`."
   type        = bool
   default     = false
 }
 
 variable "pim_bsr_listen_updates" {
-  description = "VRF PIM BSR Listen Updates flag. Default value: `false`."
+  description = "VRF PIM BSR listen updates flag. Default value: `false`."
   type        = bool
   default     = false
 }
 
 variable "pim_bsr_filter_multicast_route_map" {
-  description = "VRF PIM BSR Multicast Route Map."
+  description = "VRF PIM BSR multicast route map."
   type        = string
   default     = ""
 
@@ -278,19 +278,19 @@ variable "pim_bsr_filter_multicast_route_map" {
 }
 
 variable "pim_auto_rp_forward_updates" {
-  description = "VRF PIM Auto RP Forward Updates flag. Default value: `false`."
+  description = "VRF PIM auto RP forward updates flag. Default value: `false`."
   type        = bool
   default     = false
 }
 
 variable "pim_auto_rp_listen_updates" {
-  description = "VRF PIM Auto RP Listen Updates flag. Default value: `false`."
+  description = "VRF PIM auto RP listen updates flag. Default value: `false`."
   type        = bool
   default     = false
 }
 
 variable "pim_auto_rp_filter_multicast_route_map" {
-  description = "VRF PIM Auto RP Multicast Route Map."
+  description = "VRF PIM auto RP multicast route map."
   type        = string
   default     = ""
 
@@ -301,7 +301,7 @@ variable "pim_auto_rp_filter_multicast_route_map" {
 }
 
 variable "pim_asm_shared_range_multicast_route_map" {
-  description = "VRF PIM ASM Shared Range Multicast Route Map."
+  description = "VRF PIM ASM shared range multicast route map."
   type        = string
   default     = ""
 
@@ -312,7 +312,7 @@ variable "pim_asm_shared_range_multicast_route_map" {
 }
 
 variable "pim_asm_sg_expiry" {
-  description = "VRF PIM ASM Source-Group Expiry timeout. Allowed values 180-604801 or `default-timeout`. Default value `default-timeout`"
+  description = "VRF PIM ASM SG expiry timeout. Allowed values 180-604801 or `default-timeout`. Default value `default-timeout`"
   type        = string
   default     = "default-timeout"
 
@@ -323,7 +323,7 @@ variable "pim_asm_sg_expiry" {
 }
 
 variable "asm_sg_expiry_multicast_route_map" {
-  description = "VRF PIM Source-Group Expiry Multicast Route Map."
+  description = "VRF PIM SG expiry multicast route map."
   type        = string
   default     = ""
 
@@ -334,7 +334,7 @@ variable "asm_sg_expiry_multicast_route_map" {
 }
 
 variable "pim_asm_traffic_registry_max_rate" {
-  description = "VRF PIM ASM TraffiC Registry Max Rate. Allowed values bewtween `1`-`65535`. Default value `65535`"
+  description = "VRF PIM ASM traffic registry max rate. Allowed values bewtween `1`-`65535`. Default value `65535`"
   type        = number
   default     = 65535
 
@@ -345,7 +345,7 @@ variable "pim_asm_traffic_registry_max_rate" {
 }
 
 variable "pim_asm_traffic_registry_source_ip" {
-  description = "VRF PIM ASM Traffic Registry Source IP."
+  description = "VRF PIM ASM traffic registry source IP."
   type        = string
   default     = ""
 
@@ -357,7 +357,7 @@ variable "pim_asm_traffic_registry_source_ip" {
 
 
 variable "pim_ssm_group_range_multicast_route_map" {
-  description = "VRF PIM SSM Group Range Multicast Route Map."
+  description = "VRF PIM SSM group range multicast route map."
   type        = string
   default     = ""
 
@@ -368,7 +368,7 @@ variable "pim_ssm_group_range_multicast_route_map" {
 }
 
 variable "pim_inter_vrf_policies" {
-  description = "VRF PIM Inter-VRF Policies."
+  description = "VRF PIM inter-VRF policies."
   type = list(object({
     tenant              = string
     vrf                 = string
@@ -400,7 +400,7 @@ variable "pim_inter_vrf_policies" {
 }
 
 variable "pim_igmp_ssm_translate_policies" {
-  description = "VRF IGMP SSM Tranlate Policies."
+  description = "VRF IGMP SSM tranlate policies."
   type = list(object({
     group_prefix   = string
     source_address = string

@@ -1,3 +1,7 @@
+## 0.2.0 (unreleased)
+
+- Add PIM attributes
+
 ## 0.1.6
 
 - Fix creation of `leakRoutes` object
