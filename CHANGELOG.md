@@ -1,4 +1,4 @@
-## 0.2.2 (unreleased)
+## 0.2.2
 
 - Fix configuration issue with reserved multicast entries and route maps
 
