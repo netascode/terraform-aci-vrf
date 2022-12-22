@@ -68,7 +68,7 @@ module "main" {
   pim_auto_rp_filter_multicast_route_map   = "TEST_RM"
   pim_asm_shared_range_multicast_route_map = "TEST_RM"
   pim_asm_sg_expiry                        = 1800
-  asm_sg_expiry_multicast_route_map        = "TEST_RM"
+  pim_asm_sg_expiry_multicast_route_map    = "TEST_RM"
   pim_asm_traffic_registry_max_rate        = 10
   pim_asm_traffic_registry_source_ip       = "1.1.1.1"
   pim_ssm_group_range_multicast_route_map  = "TEST_RM"

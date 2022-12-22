@@ -62,7 +62,7 @@ module "aci_vrf" {
   pim_auto_rp_filter_multicast_route_map   = "MCAST_RM2"
   pim_asm_shared_range_multicast_route_map = "MCAST_RM3"
   pim_asm_sg_expiry                        = 1800
-  asm_sg_expiry_multicast_route_map        = "MCAST_RM4"
+  pim_asm_sg_expiry_multicast_route_map    = "MCAST_RM4"
   pim_asm_traffic_registry_max_rate        = 10
   pim_asm_traffic_registry_source_ip       = "1.1.1.1"
   pim_ssm_group_range_multicast_route_map  = "MCAST_RM5"
@@ -155,7 +155,7 @@ module "aci_vrf" {
 | <a name="input_pim_auto_rp_filter_multicast_route_map"></a> [pim\_auto\_rp\_filter\_multicast\_route\_map](#input\_pim\_auto\_rp\_filter\_multicast\_route\_map) | VRF PIM auto RP multicast route map. | `string` | `""` | no |
 | <a name="input_pim_asm_shared_range_multicast_route_map"></a> [pim\_asm\_shared\_range\_multicast\_route\_map](#input\_pim\_asm\_shared\_range\_multicast\_route\_map) | VRF PIM ASM shared range multicast route map. | `string` | `""` | no |
 | <a name="input_pim_asm_sg_expiry"></a> [pim\_asm\_sg\_expiry](#input\_pim\_asm\_sg\_expiry) | VRF PIM ASM SG expiry timeout. Allowed values 180-604801 or `default-timeout`. Default value `default-timeout` | `string` | `"default-timeout"` | no |
-| <a name="input_asm_sg_expiry_multicast_route_map"></a> [asm\_sg\_expiry\_multicast\_route\_map](#input\_asm\_sg\_expiry\_multicast\_route\_map) | VRF PIM SG expiry multicast route map. | `string` | `""` | no |
+| <a name="input_pim_asm_sg_expiry_multicast_route_map"></a> [pim\_asm\_sg\_expiry\_multicast\_route\_map](#input\_pim\_asm\_sg\_expiry\_multicast\_route\_map) | VRF PIM SG expiry multicast route map. | `string` | `""` | no |
 | <a name="input_pim_asm_traffic_registry_max_rate"></a> [pim\_asm\_traffic\_registry\_max\_rate](#input\_pim\_asm\_traffic\_registry\_max\_rate) | VRF PIM ASM traffic registry max rate. Allowed values bewtween `1`-`65535`. Default value `65535` | `number` | `65535` | no |
 | <a name="input_pim_asm_traffic_registry_source_ip"></a> [pim\_asm\_traffic\_registry\_source\_ip](#input\_pim\_asm\_traffic\_registry\_source\_ip) | VRF PIM ASM traffic registry source IP. | `string` | `""` | no |
 | <a name="input_pim_ssm_group_range_multicast_route_map"></a> [pim\_ssm\_group\_range\_multicast\_route\_map](#input\_pim\_ssm\_group\_range\_multicast\_route\_map) | VRF PIM SSM group range multicast route map. | `string` | `""` | no |

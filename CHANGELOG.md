@@ -1,3 +1,7 @@
+## 0.2.1 (unreleased)
+
+- BREAKING CHANGE: Rename `asm_sg_expiry_multicast_route_map` to `pim_asm_sg_expiry_multicast_route_map`
+
 ## 0.2.0
 
 - Add PIM attributes

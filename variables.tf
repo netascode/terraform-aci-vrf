@@ -322,13 +322,13 @@ variable "pim_asm_sg_expiry" {
   }
 }
 
-variable "asm_sg_expiry_multicast_route_map" {
+variable "pim_asm_sg_expiry_multicast_route_map" {
   description = "VRF PIM SG expiry multicast route map."
   type        = string
   default     = ""
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.asm_sg_expiry_multicast_route_map))
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.pim_asm_sg_expiry_multicast_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
   }
 }

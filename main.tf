@@ -285,11 +285,11 @@ resource "aci_rest_managed" "pimSGRangeExpPol" {
 }
 
 resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
-  count      = var.pim_enabled == true && var.asm_sg_expiry_multicast_route_map != "" ? 1 : 0
+  count      = var.pim_enabled == true && var.pim_asm_sg_expiry_multicast_route_map != "" ? 1 : 0
   dn         = "${aci_rest_managed.pimSGRangeExpPol[0].dn}/rsfilterToRtMapPol"
   class_name = "rtdmcRsFilterToRtMapPol"
   content = {
-    tDn = "uni/tn-${var.tenant}/rtmap-${var.asm_sg_expiry_multicast_route_map}"
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_asm_sg_expiry_multicast_route_map}"
   }
 }
 
