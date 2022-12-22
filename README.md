@@ -30,6 +30,59 @@ module "aci_vrf" {
   contract_consumers                     = ["CON1"]
   contract_providers                     = ["CON1"]
   contract_imported_consumers            = ["I_CON1"]
+  pim_enabled                            = true
+  pim_mtu                                = 9200
+  pim_fast_convergence                   = true
+  pim_strict_rfc                         = true
+  pim_max_multicast_entries              = 1000
+  pim_reserved_multicast_entries         = "undefined"
+  pim_static_rps = [
+    {
+      ip                  = "1.1.1.1"
+      multicast_route_map = "TEST_RM"
+    },
+    {
+      ip = "1.1.1.2"
+    },
+  ]
+  pim_fabric_rps = [
+    {
+      ip                  = "2.2.2.1"
+      multicast_route_map = "TEST_RM"
+    },
+    {
+      ip = "2.2.2.2"
+    }
+  ]
+  pim_bsr_listen_updates                   = true
+  pim_bsr_forward_updates                  = true
+  pim_bsr_filter_multicast_route_map       = "MCAST_RM1"
+  pim_auto_rp_listen_updates               = true
+  pim_auto_rp_forward_updates              = true
+  pim_auto_rp_filter_multicast_route_map   = "MCAST_RM2"
+  pim_asm_shared_range_multicast_route_map = "MCAST_RM3"
+  pim_asm_sg_expiry                        = 1800
+  asm_sg_expiry_multicast_route_map        = "MCAST_RM4"
+  pim_asm_traffic_registry_max_rate        = 10
+  pim_asm_traffic_registry_source_ip       = "1.1.1.1"
+  pim_ssm_group_range_multicast_route_map  = "MCAST_RM5"
+  pim_inter_vrf_policies = [
+    {
+      tenant              = "TEN2"
+      vrf                 = "VRF1"
+      multicast_route_map = "MCAST_RM6"
+    }
+  ]
+  pim_igmp_ssm_translate_policies = [
+    {
+      group_prefix   = "228.0.0.0/8"
+      source_address = "3.3.3.3"
+    },
+    {
+      group_prefix   = "229.0.0.0/8"
+      source_address = "4.4.4.4"
+    }
+  ]
   leaked_internal_prefixes = [{
     prefix = "1.1.1.0/24"
     public = true
@@ -85,6 +138,29 @@ module "aci_vrf" {
 | <a name="input_contract_consumers"></a> [contract\_consumers](#input\_contract\_consumers) | List of contract consumers. | `list(string)` | `[]` | no |
 | <a name="input_contract_providers"></a> [contract\_providers](#input\_contract\_providers) | List of contract providers. | `list(string)` | `[]` | no |
 | <a name="input_contract_imported_consumers"></a> [contract\_imported\_consumers](#input\_contract\_imported\_consumers) | List of imported contract consumers. | `list(string)` | `[]` | no |
+| <a name="input_pim_enabled"></a> [pim\_enabled](#input\_pim\_enabled) | VRF PIM. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_mtu"></a> [pim\_mtu](#input\_pim\_mtu) | VRF PIM MTU. Allowed values `1`-`9300`. Default value `1500` | `number` | `1500` | no |
+| <a name="input_pim_fast_convergence"></a> [pim\_fast\_convergence](#input\_pim\_fast\_convergence) | VRF PIM fast convergence. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_strict_rfc"></a> [pim\_strict\_rfc](#input\_pim\_strict\_rfc) | VRF PIM Strict RFC compliant. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_max_multicast_entries"></a> [pim\_max\_multicast\_entries](#input\_pim\_max\_multicast\_entries) | VRF Maximum number of multicast entries. Allowed valued between `1`-`4294967295` or `unlimited`. Default value `unlimited.` | `string` | `"unlimited"` | no |
+| <a name="input_pim_reserved_multicast_entries"></a> [pim\_reserved\_multicast\_entries](#input\_pim\_reserved\_multicast\_entries) | VRF PIM Maximum number of multicast entries. Allowed valued between `0`-`4294967295`. Default value `undefined` | `string` | `"undefined"` | no |
+| <a name="input_pim_resource_policy_multicast_route_map"></a> [pim\_resource\_policy\_multicast\_route\_map](#input\_pim\_resource\_policy\_multicast\_route\_map) | VRF PIM Resource Policy Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_static_rps"></a> [pim\_static\_rps](#input\_pim\_static\_rps) | VRF PIM Static RPs. | <pre>list(object({<br>    ip                  = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
+| <a name="input_pim_fabric_rps"></a> [pim\_fabric\_rps](#input\_pim\_fabric\_rps) | VRF PIM Fabric RPs. | <pre>list(object({<br>    ip                  = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
+| <a name="input_pim_bsr_forward_updates"></a> [pim\_bsr\_forward\_updates](#input\_pim\_bsr\_forward\_updates) | VRF PIM BSR Forward Updates flag. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_bsr_listen_updates"></a> [pim\_bsr\_listen\_updates](#input\_pim\_bsr\_listen\_updates) | VRF PIM BSR Listen Updates flag. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_bsr_filter_multicast_route_map"></a> [pim\_bsr\_filter\_multicast\_route\_map](#input\_pim\_bsr\_filter\_multicast\_route\_map) | VRF PIM BSR Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_auto_rp_forward_updates"></a> [pim\_auto\_rp\_forward\_updates](#input\_pim\_auto\_rp\_forward\_updates) | VRF PIM Auto RP Forward Updates flag. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_auto_rp_listen_updates"></a> [pim\_auto\_rp\_listen\_updates](#input\_pim\_auto\_rp\_listen\_updates) | VRF PIM Auto RP Listen Updates flag. Default value: `false`. | `bool` | `false` | no |
+| <a name="input_pim_auto_rp_filter_multicast_route_map"></a> [pim\_auto\_rp\_filter\_multicast\_route\_map](#input\_pim\_auto\_rp\_filter\_multicast\_route\_map) | VRF PIM Auto RP Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_asm_shared_range_multicast_route_map"></a> [pim\_asm\_shared\_range\_multicast\_route\_map](#input\_pim\_asm\_shared\_range\_multicast\_route\_map) | VRF PIM ASM Shared Range Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_asm_sg_expiry"></a> [pim\_asm\_sg\_expiry](#input\_pim\_asm\_sg\_expiry) | VRF PIM ASM Source-Group Expiry timeout. Allowed values 180-604801 or `default-timeout`. Default value `default-timeout` | `string` | `"default-timeout"` | no |
+| <a name="input_asm_sg_expiry_multicast_route_map"></a> [asm\_sg\_expiry\_multicast\_route\_map](#input\_asm\_sg\_expiry\_multicast\_route\_map) | VRF PIM Source-Group Expiry Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_asm_traffic_registry_max_rate"></a> [pim\_asm\_traffic\_registry\_max\_rate](#input\_pim\_asm\_traffic\_registry\_max\_rate) | VRF PIM ASM TraffiC Registry Max Rate. Allowed values bewtween `1`-`65535`. Default value `65535` | `number` | `65535` | no |
+| <a name="input_pim_asm_traffic_registry_source_ip"></a> [pim\_asm\_traffic\_registry\_source\_ip](#input\_pim\_asm\_traffic\_registry\_source\_ip) | VRF PIM ASM Traffic Registry Source IP. | `string` | `""` | no |
+| <a name="input_pim_ssm_group_range_multicast_route_map"></a> [pim\_ssm\_group\_range\_multicast\_route\_map](#input\_pim\_ssm\_group\_range\_multicast\_route\_map) | VRF PIM SSM Group Range Multicast Route Map. | `string` | `""` | no |
+| <a name="input_pim_inter_vrf_policies"></a> [pim\_inter\_vrf\_policies](#input\_pim\_inter\_vrf\_policies) | VRF PIM Inter-VRF Policies. | <pre>list(object({<br>    tenant              = string<br>    vrf                 = string<br>    multicast_route_map = optional(string, "")<br>  }))</pre> | `[]` | no |
+| <a name="input_pim_igmp_ssm_translate_policies"></a> [pim\_igmp\_ssm\_translate\_policies](#input\_pim\_igmp\_ssm\_translate\_policies) | VRF IGMP SSM Tranlate Policies. | <pre>list(object({<br>    group_prefix   = string<br>    source_address = string<br>  }))</pre> | `[]` | no |
 | <a name="input_leaked_internal_prefixes"></a> [leaked\_internal\_prefixes](#input\_leaked\_internal\_prefixes) | List of leaked internal prefixes. Default value `public`: false. | <pre>list(object({<br>    prefix = string<br>    public = optional(bool, false)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>      public      = optional(bool)<br>    })), [])<br>  }))</pre> | `[]` | no |
 | <a name="input_leaked_external_prefixes"></a> [leaked\_external\_prefixes](#input\_leaked\_external\_prefixes) | List of leaked external prefixes. | <pre>list(object({<br>    prefix             = string<br>    from_prefix_length = optional(number)<br>    to_prefix_length   = optional(number)<br>    destinations = optional(list(object({<br>      description = optional(string, "")<br>      tenant      = string<br>      vrf         = string<br>    })), [])<br>  }))</pre> | `[]` | no |
 
@@ -104,11 +180,42 @@ module "aci_vrf" {
 | [aci_rest_managed.fvRsBgpCtxPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv4](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv6](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.igmpCtxP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.igmpSSMXlateP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.leakExternalPrefix](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.leakInternalSubnet](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.leakRoutes](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.leakTo_external](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.leakTo_internal](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimASMPatPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimAutoRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimBSRFilterPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimBSRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimCtxP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimFabricRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimInterVRFEntryPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimInterVRFPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimMAFilterPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimRPGrpRangePol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimRPGrpRangePol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimRegTrPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimResPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSGRangeExpPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSSMPatPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSSMRangePol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimSharedRangePol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimStaticRPEntryPol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimStaticRPEntryPol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimStaticRPPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_sg_expiry](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_shared](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_auto_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_bsr](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_fabric_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_pim_inter_vrf](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_ssm_range](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.rtdmcRsFilterToRtMapPol_static_rp](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzAny](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzRsAnyToCons](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.vzRsAnyToConsIf](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

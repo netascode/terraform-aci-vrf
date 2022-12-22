@@ -114,6 +114,257 @@ resource "aci_rest_managed" "dnsLbl" {
   }
 }
 
+resource "aci_rest_managed" "pimCtxP" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/pimctxp"
+  class_name = "pimCtxP"
+  content = {
+    mtu  = var.pim_mtu
+    ctrl = join(",", concat(var.pim_fast_convergence == true ? ["fast-conv"] : [], var.pim_strict_rfc == true ? ["strict-rfc-compliant"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimResPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/res"
+  class_name = "pimResPol"
+  content = {
+    max  = var.pim_max_multicast_entries
+    rsvd = var.pim_reserved_multicast_entries
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol" {
+  count      = var.pim_enabled == true && var.pim_resource_policy_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimResPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_resource_policy_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimStaticRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/staticrp"
+  class_name = "pimStaticRPPol"
+}
+
+resource "aci_rest_managed" "pimStaticRPEntryPol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimStaticRPPol[0].dn}/staticrpent-[${each.value.ip}]"
+  class_name = "pimStaticRPEntryPol"
+  content = {
+    rpIp = each.value.ip
+  }
+}
+
+resource "aci_rest_managed" "pimRPGrpRangePol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimStaticRPEntryPol_static_rp[each.value.ip].dn}/rpgrprange"
+  class_name = "pimRPGrpRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_static_rp" {
+  for_each   = { for rp in var.pim_static_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimRPGrpRangePol_static_rp[each.value.ip].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimFabricRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/fabricrp"
+  class_name = "pimFabricRPPol"
+}
+
+resource "aci_rest_managed" "pimStaticRPEntryPol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimFabricRPPol[0].dn}/staticrpent-[${each.value.ip}]"
+  class_name = "pimStaticRPEntryPol"
+  content = {
+    rpIp = each.value.ip
+  }
+}
+
+resource "aci_rest_managed" "pimRPGrpRangePol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimStaticRPEntryPol_fabric_rp[each.value.ip].dn}/rpgrprange"
+  class_name = "pimRPGrpRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_fabric_rp" {
+  for_each   = { for rp in var.pim_fabric_rps : rp.ip => rp if var.pim_enabled == true && rp.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimRPGrpRangePol_fabric_rp[each.value.ip].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimBSRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/bsrp"
+  class_name = "pimBSRPPol"
+  content = {
+    ctrl = join(",", concat(var.pim_bsr_forward_updates == true ? ["forward"] : [], var.pim_bsr_listen_updates == true ? ["listen"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimBSRFilterPol" {
+  count      = var.pim_enabled == true && var.pim_bsr_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimBSRPPol[0].dn}/bsfilter"
+  class_name = "pimBSRFilterPol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_bsr" {
+  count      = var.pim_enabled == true && var.pim_bsr_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimBSRFilterPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_bsr_filter_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimAutoRPPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/autorp"
+  class_name = "pimAutoRPPol"
+  content = {
+    ctrl = join(",", concat(var.pim_auto_rp_forward_updates == true ? ["forward"] : [], var.pim_auto_rp_listen_updates == true ? ["listen"] : []))
+  }
+}
+
+resource "aci_rest_managed" "pimMAFilterPol" {
+  count      = var.pim_enabled == true && var.pim_auto_rp_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimAutoRPPol[0].dn}/mafilter"
+  class_name = "pimMAFilterPol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_auto_rp" {
+  count      = var.pim_enabled == true && var.pim_auto_rp_filter_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimMAFilterPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_auto_rp_filter_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimASMPatPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/asmpat"
+  class_name = "pimASMPatPol"
+  content = {
+    ctrl = ""
+  }
+}
+
+resource "aci_rest_managed" "pimSharedRangePol" {
+  count      = var.pim_enabled == true && var.pim_asm_shared_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/sharedrange"
+  class_name = "pimSharedRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  count      = var.pim_enabled == true && var.pim_asm_shared_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSharedRangePol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_asm_shared_range_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimSGRangeExpPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/sgrangeexp"
+  class_name = "pimSGRangeExpPol"
+  content = {
+    sgExpItvl = var.pim_asm_sg_expiry
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  count      = var.pim_enabled == true && var.asm_sg_expiry_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSGRangeExpPol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.asm_sg_expiry_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimRegTrPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimASMPatPol[0].dn}/regtr"
+  class_name = "pimRegTrPol"
+  content = {
+    maxRate = var.pim_asm_traffic_registry_max_rate
+    srcIp   = var.pim_asm_traffic_registry_source_ip
+  }
+}
+
+resource "aci_rest_managed" "pimSSMPatPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/ssmpat"
+  class_name = "pimSSMPatPol"
+}
+
+resource "aci_rest_managed" "pimSSMRangePol" {
+  count      = var.pim_enabled == true && var.pim_ssm_group_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSSMPatPol[0].dn}/ssmrange"
+  class_name = "pimSSMRangePol"
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  count      = var.pim_enabled == true && var.pim_ssm_group_range_multicast_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.pimSSMRangePol[0].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${var.pim_ssm_group_range_multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "pimInterVRFPol" {
+  count      = var.pim_enabled == true ? 1 : 0
+  dn         = "${aci_rest_managed.pimCtxP[0].dn}/intervrf"
+  class_name = "pimInterVRFPol"
+}
+
+resource "aci_rest_managed" "pimInterVRFEntryPol" {
+  for_each   = { for vrf_pol in var.pim_inter_vrf_policies : vrf_pol.vrf => vrf_pol if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.pimInterVRFPol[0].dn}/intervrfent-[uni/tn-${each.value.tenant}/ctx-${each.value.vrf}]"
+  class_name = "pimInterVRFEntryPol"
+  content = {
+    srcVrfDn = "uni/tn-${each.value.tenant}/ctx-${each.value.vrf}"
+  }
+}
+
+resource "aci_rest_managed" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  for_each   = { for vrf_pol in var.pim_inter_vrf_policies : vrf_pol.vrf => vrf_pol if var.pim_enabled == true && vrf_pol.multicast_route_map != "" }
+  dn         = "${aci_rest_managed.pimInterVRFEntryPol[each.value.vrf].dn}/rsfilterToRtMapPol"
+  class_name = "rtdmcRsFilterToRtMapPol"
+  content = {
+    tDn = "uni/tn-${var.tenant}/rtmap-${each.value.multicast_route_map}"
+  }
+}
+
+resource "aci_rest_managed" "igmpCtxP" {
+  count      = var.pim_enabled == true && length(var.pim_igmp_ssm_translate_policies) != 0 ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/igmpctxp"
+  class_name = "igmpCtxP"
+}
+
+resource "aci_rest_managed" "igmpSSMXlateP" {
+  for_each   = { for pol in var.pim_igmp_ssm_translate_policies : "${pol.group_prefix}-${pol.source_address}" => pol if var.pim_enabled == true }
+  dn         = "${aci_rest_managed.igmpCtxP[0].dn}/ssmxlate-[${each.value.group_prefix}]-[${each.value.source_address}]"
+  class_name = "igmpSSMXlateP"
+  content = {
+    descr   = "${each.value.group_prefix}-${each.value.source_address}"
+    grpPfx  = each.value.group_prefix
+    srcAddr = each.value.source_address
+  }
+}
+
 resource "aci_rest_managed" "leakRoutes" {
   count      = length(var.leaked_internal_prefixes) > 0 || length(var.leaked_external_prefixes) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.fvCtx.dn}/leakroutes"

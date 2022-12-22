@@ -36,6 +36,59 @@ module "main" {
   contract_consumers                     = ["CON1"]
   contract_providers                     = ["CON1"]
   contract_imported_consumers            = ["I_CON1"]
+  pim_enabled                            = true
+  pim_mtu                                = 9200
+  pim_fast_convergence                   = true
+  pim_strict_rfc                         = true
+  pim_max_multicast_entries              = 1000
+  pim_reserved_multicast_entries         = "undefined"
+  pim_static_rps = [
+    {
+      ip                  = "1.1.1.1"
+      multicast_route_map = "TEST_RM"
+    },
+    {
+      ip = "1.1.1.2"
+    },
+  ]
+  pim_fabric_rps = [
+    {
+      ip                  = "2.2.2.1"
+      multicast_route_map = "TEST_RM"
+    },
+    {
+      ip = "2.2.2.2"
+    }
+  ]
+  pim_bsr_listen_updates                   = true
+  pim_bsr_forward_updates                  = true
+  pim_bsr_filter_multicast_route_map       = "TEST_RM"
+  pim_auto_rp_listen_updates               = true
+  pim_auto_rp_forward_updates              = true
+  pim_auto_rp_filter_multicast_route_map   = "TEST_RM"
+  pim_asm_shared_range_multicast_route_map = "TEST_RM"
+  pim_asm_sg_expiry                        = 1800
+  asm_sg_expiry_multicast_route_map        = "TEST_RM"
+  pim_asm_traffic_registry_max_rate        = 10
+  pim_asm_traffic_registry_source_ip       = "1.1.1.1"
+  pim_ssm_group_range_multicast_route_map  = "TEST_RM"
+  pim_inter_vrf_policies = [
+    {
+      tenant              = "TEST_TEN"
+      vrf                 = "TEST_VRF"
+      multicast_route_map = "TEST_RM"
+    }
+  ]
+  pim_igmp_ssm_translate_policies = [
+    {
+      group_prefix   = "228.0.0.0/8"
+      source_address = "3.3.3.3"
+    },
+    {
+      group_prefix   = "229.0.0.0/8"
+      source_address = "4.4.4.4"
+    }
+  ]
   leaked_internal_prefixes = [{
     prefix = "1.1.1.0/24"
     public = true
@@ -242,6 +295,304 @@ resource "test_assertions" "dnsLbl" {
     description = "name"
     got         = data.aci_rest_managed.dnsLbl.content.name
     want        = "DNS1"
+  }
+}
+
+data "aci_rest_managed" "pimCtxP" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/pimctxp"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "pimCtxP" {
+  component = "pimCtxP"
+
+  equal "mtu" {
+    description = "mtu"
+    got         = data.aci_rest_managed.pimCtxP.content.mtu
+    want        = "9200"
+  }
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimCtxP.content.ctrl
+    want        = "fast-conv,strict-rfc-compliant"
+  }
+}
+
+data "aci_rest_managed" "pimResPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.id}/res"
+}
+
+resource "test_assertions" "pimResPol" {
+  component = "pimResPol"
+
+  equal "max" {
+    description = "max"
+    got         = data.aci_rest_managed.pimResPol.content.max
+    want        = "1000"
+  }
+
+  equal "rsvd" {
+    description = "rsvd"
+    got         = data.aci_rest_managed.pimResPol.content.rsvd
+    want        = "undefined"
+  }
+}
+
+data "aci_rest_managed" "pimStaticRPEntryPol_static_rp" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/staticrp/staticrpent-[1.1.1.1]"
+}
+
+resource "test_assertions" "pimStaticRPEntryPol_static_rp" {
+  component = "pimStaticRPEntryPol"
+
+  equal "rpIp" {
+    description = "rpIp"
+    got         = data.aci_rest_managed.pimStaticRPEntryPol_static_rp.content.rpIp
+    want        = "1.1.1.1"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_static_rp" {
+  dn = "${data.aci_rest_managed.pimStaticRPEntryPol_static_rp.dn}/rpgrprange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_static_rp" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_static_rp.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimStaticRPEntryPol_fabric_rp" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/fabricrp/staticrpent-[2.2.2.1]"
+}
+
+resource "test_assertions" "pimStaticRPEntryPol_fabric_rp" {
+  component = "pimStaticRPEntryPol"
+
+  equal "rpIp" {
+    description = "rpIp"
+    got         = data.aci_rest_managed.pimStaticRPEntryPol_fabric_rp.content.rpIp
+    want        = "2.2.2.1"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_fabric_rp" {
+  dn = "${data.aci_rest_managed.pimStaticRPEntryPol_fabric_rp.dn}/rpgrprange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_fabric_rp" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_fabric_rp.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimBSRPPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/bsrp"
+}
+
+resource "test_assertions" "pimBSRPPol" {
+  component = "pimBSRPPol"
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimBSRPPol.content.ctrl
+    want        = "forward,listen"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_bsr" {
+  dn = "${data.aci_rest_managed.pimBSRPPol.dn}/bsfilter/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_bsr" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_bsr.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimAutoRPPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/autorp"
+}
+
+resource "test_assertions" "pimAutoRPPol" {
+  component = "pimAutoRPPol"
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimAutoRPPol.content.ctrl
+    want        = "forward,listen"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_auto_rp" {
+  dn = "${data.aci_rest_managed.pimAutoRPPol.dn}/mafilter/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_auto_rp" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_auto_rp.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimASMPatPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/asmpat"
+}
+
+resource "test_assertions" "pimASMPatPol" {
+  component = "pimASMPatPol"
+
+  equal "ctrl" {
+    description = "ctrl"
+    got         = data.aci_rest_managed.pimASMPatPol.content.ctrl
+    want        = ""
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/sharedrange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_asm_shared" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_shared.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimSGRangeExpPol" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/sgrangeexp"
+}
+
+resource "test_assertions" "pimSGRangeExpPol" {
+  component = "pimSGRangeExpPol"
+
+  equal "sgExpItvl" {
+    description = "sgExpItvl"
+    got         = data.aci_rest_managed.pimSGRangeExpPol.content.sgExpItvl
+    want        = "1800"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  dn = "${data.aci_rest_managed.pimSGRangeExpPol.dn}/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_asm_sg_expiry" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_asm_sg_expiry.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimRegTrPol" {
+  dn = "${data.aci_rest_managed.pimASMPatPol.dn}/regtr"
+}
+
+resource "test_assertions" "pimRegTrPol" {
+  component = "pimRegTrPol"
+
+  equal "maxRate" {
+    description = "maxRate"
+    got         = data.aci_rest_managed.pimRegTrPol.content.maxRate
+    want        = "10"
+  }
+
+  equal "srcIp" {
+    description = "srcIp"
+    got         = data.aci_rest_managed.pimRegTrPol.content.srcIp
+    want        = "1.1.1.1"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/ssmpat/ssmrange/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_ssm_range" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_ssm_range.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "pimInterVRFEntryPol" {
+  dn = "${data.aci_rest_managed.pimCtxP.dn}/intervrf/intervrfent-[uni/tn-TEST_TEN/ctx-TEST_VRF]"
+}
+
+resource "test_assertions" "pimInterVRFEntryPol" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "srcVrfDn" {
+    description = "srcVrfDn"
+    got         = data.aci_rest_managed.pimInterVRFEntryPol.content.srcVrfDn
+    want        = "uni/tn-TEST_TEN/ctx-TEST_VRF"
+  }
+}
+
+data "aci_rest_managed" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  dn = "${data.aci_rest_managed.pimInterVRFEntryPol.dn}/rsfilterToRtMapPol"
+}
+
+resource "test_assertions" "rtdmcRsFilterToRtMapPol_pim_inter_vrf" {
+  component = "rtdmcRsFilterToRtMapPol"
+
+  equal "tDn" {
+    description = "tDn"
+    got         = data.aci_rest_managed.rtdmcRsFilterToRtMapPol_pim_inter_vrf.content.tDn
+    want        = "uni/tn-TF/rtmap-TEST_RM"
+  }
+}
+
+data "aci_rest_managed" "igmpSSMXlateP" {
+  dn = "${data.aci_rest_managed.fvCtx.dn}/igmpctxp/ssmxlate-[228.0.0.0/8]-[3.3.3.3]"
+}
+
+resource "test_assertions" "igmpSSMXlateP" {
+  component = "igmpSSMXlateP"
+
+  equal "descr" {
+    description = "descr"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.descr
+    want        = "228.0.0.0/8-3.3.3.3"
+  }
+
+  equal "grpPfx" {
+    description = "grpPfx"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.grpPfx
+    want        = "228.0.0.0/8"
+  }
+
+  equal "srcAddr" {
+    description = "srcAddr"
+    got         = data.aci_rest_managed.igmpSSMXlateP.content.srcAddr
+    want        = "3.3.3.3"
   }
 }
 
