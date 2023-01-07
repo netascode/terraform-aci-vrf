@@ -105,6 +105,64 @@ resource "aci_rest_managed" "fvRsCtxToBgpCtxAfPol_ipv6" {
   }
 }
 
+resource "aci_rest_managed" "bgpRtTargetP_ipv4" {
+  count      = var.bgp_ipv4_import_route_target != "" || var.bgp_ipv4_export_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/rtp-ipv4-ucast"
+  class_name = "bgpRtTargetP"
+  content = {
+    af = "ipv4-ucast"
+  }
+}
+
+resource "aci_rest_managed" "bgpRtTarget_ipv4_import" {
+  count      = var.bgp_ipv4_import_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.bgpRtTargetP_ipv4[0].dn}/rt-[${var.bgp_ipv4_import_route_target}]-import"
+  class_name = "bgpRtTarget"
+  content = {
+    rt   = var.bgp_ipv4_import_route_target
+    type = "import"
+  }
+}
+
+resource "aci_rest_managed" "bgpRtTarget_ipv4_export" {
+  count      = var.bgp_ipv4_export_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.bgpRtTargetP_ipv4[0].dn}/rt-[${var.bgp_ipv4_export_route_target}]-export"
+  class_name = "bgpRtTarget"
+  content = {
+    rt   = var.bgp_ipv4_export_route_target
+    type = "export"
+  }
+}
+
+resource "aci_rest_managed" "bgpRtTargetP_ipv6" {
+  count      = var.bgp_ipv6_import_route_target != "" || var.bgp_ipv6_export_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.fvCtx.dn}/rtp-ipv6-ucast"
+  class_name = "bgpRtTargetP"
+  content = {
+    af = "ipv6-ucast"
+  }
+}
+
+resource "aci_rest_managed" "bgpRtTarget_ipv6_import" {
+  count      = var.bgp_ipv6_import_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.bgpRtTargetP_ipv6[0].dn}/rt-[${var.bgp_ipv6_import_route_target}]-import"
+  class_name = "bgpRtTarget"
+  content = {
+    rt   = var.bgp_ipv6_import_route_target
+    type = "import"
+  }
+}
+
+resource "aci_rest_managed" "bgpRtTarget_ipv6_export" {
+  count      = var.bgp_ipv6_export_route_target != "" ? 1 : 0
+  dn         = "${aci_rest_managed.bgpRtTargetP_ipv6[0].dn}/rt-[${var.bgp_ipv6_export_route_target}]-export"
+  class_name = "bgpRtTarget"
+  content = {
+    rt   = var.bgp_ipv6_export_route_target
+    type = "export"
+  }
+}
+
 resource "aci_rest_managed" "dnsLbl" {
   for_each   = toset(var.dns_labels)
   dn         = "${aci_rest_managed.fvCtx.dn}/dnslbl-${each.value}"

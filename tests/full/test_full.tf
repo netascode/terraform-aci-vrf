@@ -32,6 +32,10 @@ module "main" {
   bgp_timer_policy                        = "BGP1"
   bgp_ipv4_address_family_context_policy  = "BGP_AF_IPV4"
   bgp_ipv6_address_family_context_policy  = "BGP_AF_IPV6"
+  bgp_ipv4_import_route_target            = "route-target:as2-nn2:10:10"
+  bgp_ipv4_export_route_target            = "route-target:as2-nn2:10:10"
+  bgp_ipv6_import_route_target            = "route-target:as2-nn2:10:10"
+  bgp_ipv6_export_route_target            = "route-target:as2-nn2:10:10"
   dns_labels                              = ["DNS1"]
   contract_consumers                      = ["CON1"]
   contract_providers                      = ["CON1"]
@@ -280,6 +284,126 @@ resource "test_assertions" "fvRsCtxToBgpCtxAfPol_ipv6" {
     description = "tnBgpCtxAfPolName"
     got         = data.aci_rest_managed.fvRsCtxToBgpCtxAfPol_ipv6.content.tnBgpCtxAfPolName
     want        = "BGP_AF_IPV6"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTargetP_ipv4" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/rtp-ipv4-ucast"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTargetP_ipv4" {
+  component = "bgpRtTargetP_ipv4"
+
+  equal "af" {
+    description = "af"
+    got         = data.aci_rest_managed.bgpRtTargetP_ipv4.content.af
+    want        = "ipv4-ucast"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTarget_ipv4_import" {
+  dn = "${data.aci_rest_managed.bgpRtTargetP_ipv4.id}/rt-[route-target:as2-nn2:10:10]-import"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTarget_ipv4_import" {
+  component = "bgpRtTarget_ipv4_import"
+
+  equal "rt" {
+    description = "rt"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv4_import.content.rt
+    want        = "route-target:as2-nn2:10:10"
+  }
+
+  equal "type" {
+    description = "type"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv4_import.content.type
+    want        = "import"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTarget_ipv4_export" {
+  dn = "${data.aci_rest_managed.bgpRtTargetP_ipv4.id}/rt-[route-target:as2-nn2:10:10]-export"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTarget_ipv4_export" {
+  component = "bgpRtTarget_ipv4_export"
+
+  equal "rt" {
+    description = "rt"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv4_export.content.rt
+    want        = "route-target:as2-nn2:10:10"
+  }
+
+  equal "type" {
+    description = "type"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv4_export.content.type
+    want        = "export"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTargetP_ipv6" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/rtp-ipv6-ucast"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTargetP_ipv6" {
+  component = "bgpRtTargetP_ipv6"
+
+  equal "af" {
+    description = "af"
+    got         = data.aci_rest_managed.bgpRtTargetP_ipv6.content.af
+    want        = "ipv6-ucast"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTarget_ipv6_import" {
+  dn = "${data.aci_rest_managed.bgpRtTargetP_ipv6.id}/rt-[route-target:as2-nn2:10:10]-import"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTarget_ipv6_import" {
+  component = "bgpRtTarget_ipv6_import"
+
+  equal "rt" {
+    description = "rt"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv6_import.content.rt
+    want        = "route-target:as2-nn2:10:10"
+  }
+
+  equal "type" {
+    description = "type"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv6_import.content.type
+    want        = "import"
+  }
+}
+
+data "aci_rest_managed" "bgpRtTarget_ipv6_export" {
+  dn = "${data.aci_rest_managed.bgpRtTargetP_ipv6.id}/rt-[route-target:as2-nn2:10:10]-export"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "bgpRtTarget_ipv6_export" {
+  component = "bgpRtTarget_ipv6_export"
+
+  equal "rt" {
+    description = "rt"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv6_export.content.rt
+    want        = "route-target:as2-nn2:10:10"
+  }
+
+  equal "type" {
+    description = "type"
+    got         = data.aci_rest_managed.bgpRtTarget_ipv6_export.content.type
+    want        = "export"
   }
 }
 

@@ -1,3 +1,7 @@
+## 0.2.3 (unreleased)
+
+- Add BGP IPv4/IPv6 import/export route targets
+
 ## 0.2.2
 
 - Fix configuration issue with reserved multicast entries and route maps
