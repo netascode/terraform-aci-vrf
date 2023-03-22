@@ -77,6 +77,14 @@ resource "aci_rest_managed" "vzRsAnyToConsIf" {
   }
 }
 
+resource "aci_rest_managed" "fvRsCtxToExtRouteTagPol" {
+  dn         = "${aci_rest_managed.fvCtx.dn}/rsctxToExtRouteTagPol "
+  class_name = "fvRsCtxToExtRouteTagPol"
+  content = {
+    tnL3extRouteTagPolName = var.transit_route_tag_policy
+  }
+}
+
 resource "aci_rest_managed" "fvRsBgpCtxPol" {
   dn         = "${aci_rest_managed.fvCtx.dn}/rsbgpCtxPol"
   class_name = "fvRsBgpCtxPol"
