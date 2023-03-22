@@ -23,6 +23,7 @@ module "aci_vrf" {
   enforcement_preference                 = "unenforced"
   data_plane_learning                    = false
   preferred_group                        = true
+  transit_route_tag_policy               = "TRP1"
   bgp_timer_policy                       = "BGP1"
   bgp_ipv4_address_family_context_policy = "BGP_AF_IPV4"
   bgp_ipv6_address_family_context_policy = "BGP_AF_IPV6"
@@ -121,7 +122,7 @@ module "aci_vrf" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aci"></a> [aci](#provider\_aci) | >= 2.0.0 |
+| <a name="provider_aci"></a> [aci](#provider\_aci) | 2.5.2 |
 
 ## Inputs
 
