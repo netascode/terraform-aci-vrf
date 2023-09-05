@@ -29,6 +29,7 @@ module "main" {
   enforcement_preference                  = "unenforced"
   data_plane_learning                     = false
   preferred_group                         = true
+  transit_route_tag_policy                = "TRP1"
   bgp_timer_policy                        = "BGP1"
   bgp_ipv4_address_family_context_policy  = "BGP_AF_IPV4"
   bgp_ipv6_address_family_context_policy  = "BGP_AF_IPV6"
@@ -223,6 +224,22 @@ resource "test_assertions" "vzRsAnyToConsIf" {
     description = "tnVzCPIfName"
     got         = data.aci_rest_managed.vzRsAnyToConsIf.content.tnVzCPIfName
     want        = "I_CON1"
+  }
+}
+
+data "aci_rest_managed" "fvRsCtxToExtRouteTagPol" {
+  dn = "${data.aci_rest_managed.fvCtx.id}/rsctxToExtRouteTagPol "
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "fvRsCtxToExtRouteTagPol" {
+  component = "fvRsCtxToExtRouteTagPol"
+
+  equal "tnL3extRouteTagPolName" {
+    description = "tnL3extRouteTagPolName"
+    got         = data.aci_rest_managed.fvRsCtxToExtRouteTagPol.content.tnL3extRouteTagPolName
+    want        = "TRP1"
   }
 }
 
