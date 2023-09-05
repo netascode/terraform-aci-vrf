@@ -13,10 +13,6 @@ jobs:
     timeout-minutes: 10
     concurrency: testing_environment
     steps:
-      - name: Clean Environment
-        run: |
-          rm -rf .terraform/
-
       - name: Checkout
         uses: actions/checkout@v3
 
