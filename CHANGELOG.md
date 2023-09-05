@@ -1,3 +1,7 @@
+## 0.2.4 (unreleased)
+
+- Add transit route tag
+
 ## 0.2.3
 
 - Add BGP IPv4/IPv6 import/export route targets

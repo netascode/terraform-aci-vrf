@@ -228,7 +228,7 @@ resource "test_assertions" "vzRsAnyToConsIf" {
 }
 
 data "aci_rest_managed" "fvRsCtxToExtRouteTagPol" {
-  dn = "${data.aci_rest_managed.fvCtx.id}/rsctxToExtRouteTagPol "
+  dn = "${data.aci_rest_managed.fvCtx.id}/rsctxToExtRouteTagPol"
 
   depends_on = [module.main]
 }

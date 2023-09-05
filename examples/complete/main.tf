@@ -1,6 +1,6 @@
 module "aci_vrf" {
   source  = "netascode/vrf/aci"
-  version = ">= 0.2.0"
+  version = ">= 0.2.4"
 
   tenant                                 = "ABC"
   name                                   = "VRF1"
